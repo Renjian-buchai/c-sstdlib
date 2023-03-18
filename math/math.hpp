@@ -24,10 +24,11 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_HPP
-#define SSTD_HPP
+#ifndef MATH_HPP
+#define MATH_HPP
 
-#include "io.hpp"
-#include "math/math.hpp"
+#include "fraction.hpp"
+#include "mathutils.hpp"
+#include "matrix.hpp"
 
-#endif /* SSTD_HPP */
+#endif /* MATH_HPP */

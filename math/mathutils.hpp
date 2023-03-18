@@ -24,63 +24,39 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef IO_HPP
-#define IO_HPP
+#ifndef MATHUTILS_HPP
+#define MATHUTILS_HPP
 
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <forward_list>
-#include <iostream>
-#include <list>
-#include <vector>
+#include <type_traits>
+
+template <typename Condition, typename T = void>
+/// @brief Template to enable template if Condition evaluates true.
+/// @tparam Condition : condition to evaluate.
+/// @tparam T : template.
+/// @note example: template <typename T, EnableIf<std::is_arithmetic<T>>>
+using enIf = typename std::enable_if<Condition::value, T>::type;
 
 namespace sstd {
-
-template <typename T>
-void printvec(std::vector<T> vxtor) {
-  std::cout << "{ ";
-  for (auto it = vxtor.begin(); it != vxtor.end(); ++it) {
-    std::cout << *it << " ";
-  }
-  std::cout << "}\n";
-
-  return;
+/// @brief Finds the highest common faction of two positive integers
+/// @param x unsigned long long.
+/// @param y unsigned long long.
+/// @return Highest common factor of x and y.
+unsigned long long hcf(unsigned long long x, unsigned long long y) {
+  if (x == 0) return y;
+  if (y == 0) return x;
+  if (x == y) return x;
+  if (x > y) return hcf(x - y, y);
+  return hcf(x, y - x);
 }
 
-template <typename T, std::size_t N>
-void printarr(std::array<T, N> arr) {
-  std::cout << "{ ";
-  for (auto it = arr.begin(); it != arr.end(); ++it) {
-    std::cout << *it << " ";
-  }
-  std::cout << "}\n";
-
-  return;
-}
-
-template <typename T>
-void printlist(std::forward_list<T> flist) {
-  std::cout << "[ ";
-  for (auto it = flist.begin(); it != flist.end(); ++it) {
-    std::cout << *it << " ";
-  }
-  std::cout << "]\n";
-
-  return;
-}
-
-template <typename T>
-void printlist(std::list<T> list) {
-  std::cout << "[ ";
-  for (auto it = list.begin(); it != list.end(); ++it) {
-    std::cout << *it << " ";
-  }
-  std::cout << "]\n";
-
-  return;
+/// @brief Finds the lowest common multiple of two positive integers.
+/// @param x unsigned long long.
+/// @param y unsigned long long.
+/// @return Lowest common multiple of x and y.
+unsigned long long lcm(unsigned long long x, unsigned long long y) {
+  return (x * y) / hcf(x, y);
 }
 
 }  // namespace sstd
 
-#endif /* IO_HPP */
+#endif /* MATHUTILS_HPP */
