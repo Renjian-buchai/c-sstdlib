@@ -111,7 +111,7 @@ class matrix2 {
   }
 };
 
-/// @brief Adds two matrices together.
+/// @brief Adds two matrices together. Commutative.
 /// @param m1 Matrix to be added to.
 /// @param m2 Matrix to add.
 /// @return Sum.
@@ -130,7 +130,7 @@ matrix2 matrixAdd(matrix2 m1, matrix2 m2) {
   return m3;
 }
 
-/// @brief Subtracts a matrix from another matrix.
+/// @brief Subtracts a matrix from another matrix. Not commutative.
 /// @param m1 Matrix to subtract from.
 /// @param m2 Matrix to be subtracted.
 /// @return Difference
@@ -149,15 +149,15 @@ matrix2 matrixSub(matrix2 m1, matrix2 m2) {
   return m3;
 }
 
-/// @brief Multiplies a matrix by a scalar.
+/// @brief Multiplies a matrix by a scalar. Commutative.
 /// @tparam arithType : Must be an arithmetic type.
 /// @param toMult Scalar to multiply matrix with.
 /// @param m1 Matrix to be multiplied.
 /// @return Product.
-template <typename arithType, enIf<std::is_arithmetic<arithType>>>
+template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
 matrix2 matrixMult(arithType toMult, matrix2 m1) {
   matrix2 m3(m1.sizeY, m1.sizeX);
-  for (std::size_t i = 0; it < m1.sizeY; ++i) {
+  for (std::size_t i = 0; i < m1.sizeY; ++i) {
     for (std::size_t j = 0; j < m1.sizeX; ++j) {
       m3.matrix[j][i] = m1.matrix[j][i] * toMult;
     }
@@ -165,22 +165,45 @@ matrix2 matrixMult(arithType toMult, matrix2 m1) {
   return m3;
 }
 
-/// @brief Multiplies a matrix by a scalar.
+/// @brief Multiplies a matrix by a scalar. Commutative.
 /// @tparam arithType : Must be an arithmetic type.
 /// @param m1 Matrix to be multiplied.
 /// @param toMult Scalar to multiply matrix with.
 /// @return Product.
-template <typename arithType, enIf<std::is_arithmetic<arithType>>>
+template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
 matrix2 matrixMult(matrix2 m1, arithType toMult) {
   matrix2 m3(m1.sizeY, m1.sizeX);
-  for (std::size_t i = 0; it < m1.sizeY; ++i) {
+  for (std::size_t i = 0; i < m1.sizeY; ++i) {
     for (std::size_t j = 0; j < m1.sizeX; ++j) {
       m3.matrix[j][i] = m1.matrix[j][i] * toMult;
     }
   }
+  return m3;
+}
+
+// FIXME - Doesn't fckng work
+matrix2 matrixMult(matrix2 m1, matrix2 m2) {
+  if (m1.sizeX != m2.sizeY) {
+    throw std::invalid_argument("NoSolution");
+  }
+
+  matrix2 m3(m1.sizeY, m1.sizeX);
+
+  for (int i = 0; i < m1.sizeX; ++i) {
+    for (int j = 0; j < m2.sizeY; ++j) {
+      m3.matrix[i][j] = 0;
+      for (int ii = 0; ii < m1.sizeY; ++ii) {
+        m3.matrix[i][j] += m1.matrix[i][ii] * m2.matrix[ii][i];
+      }
+    }
+  }
+
   return m3;
 }
 
 }  // namespace sstd
 
 #endif /* MATRIX_HPP */
+
+// Write a function to multiply two matrices, assuming the matrices are 2
+// dimensional vectors.

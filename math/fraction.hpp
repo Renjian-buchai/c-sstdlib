@@ -22,6 +22,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
+ *
+ * ============================================================================
+ *
+ * Header for fraction handling.
+ *
+ * This header is focused on 'pure' fractions. This means the following:
+ * - No floating point inputs on the quotient,
+ * - No arithmetic with floating point numbers, and
+ * - Avoid mixed numbers
+ *
+ * This is a way to increase accuracy of integral calculations on rational
+ * numbers. The aim of this header is for precise yet flexible integral
+ * calculations.
+ *
+ * However, since not all calculations can be done on integrals, this does
+ * provide the functionality to:
+ * - Convert fractions to long doubles.
+ *
+ * List of utility included:
+ * - Character output in fractional (and improper fractional) form,
+ * - Character output in mixed form, and
+ * - Simplification of fractions.
+ *
+ * Operations included:
+ * - Adding      (fraction to fraction, int to fraction, fraction to int),
+ * - Subtracting (fraction from fraction, int from fraction, fraction from int),
+ * - Multiplying (fraction by fraction, fraction by int, int by fraction), and
+ * - Dividing    (Fraction by fraction, fraction by int, int by fraction).
+ * Of the above, fractions are simplified automatically by default.
+ *
+ * Hopefully to be implemented:
+ * TODO - Convert double to fractions.
+ * TODO - Optional way to disable fractions
  */
 
 #ifndef FRACTION_HPP
