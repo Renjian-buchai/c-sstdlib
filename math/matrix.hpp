@@ -85,6 +85,21 @@ class matrix2 {
     return;
   }
 
+  /// @brief Fills matrix with values.
+  /// @tparam arithType : Must be an arithmetic type.
+  /// @param valueSet The values to fill matrix with. The vector must be of
+  /// size: sizeX, and the vector vect must be of size: sizeY.
+  template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
+  void fillMatrix(std::vector<std::vector<arithType>> valueSet) {
+    for (int i = 0; i < matrix.size(); ++i) {
+      for (int j = 0; j < matrix[i].size(); ++j) {
+        matrix[i][j] = valueSet[i][j];
+      }
+    }
+
+    return;
+  }
+
   /// @brief Allows user to add matrix values one by one by prompting.
   void cinMatrix() {
     for (int i = 0; i < sizeY; ++i) {
@@ -109,6 +124,47 @@ class matrix2 {
 
     return;
   }
+
+  /// @brief Adds a matrix to this matrix.
+  /// @param m1 Matrix to add.
+  /// @return Sum of matrices
+  matrix2* add(matrix2 m1) {
+    if (sizeX != m1.sizeX || sizeY != m1.sizeY)
+      throw std::invalid_argument("NoSolution");
+
+    for (size_t i = 0; i < sizeY; ++i) {
+      for (size_t j = 0; j < sizeX; ++j) {
+        matrix[i][j] = matrix[i][j] + m1.matrix[i][j];
+      }
+    }
+
+    return this;
+  }
+
+  /// @brief Subtracts a matrix from this matrix.
+  /// @param m1 Matrix to subtract.
+  /// @return Difference of matrix.
+  /// @note If you want to subtract this matrix from something, call the
+  /// subtract method from that matrix instead.
+  matrix2* subtract(matrix2 m1) {
+    if (sizeX != m1.sizeX || sizeY != m1.sizeY) {
+      throw std::invalid_argument("NoSolution");
+    }
+
+    for (size_t i = 0; i < sizeY; ++i)
+      for (size_t j = 0; j < sizeX; ++j)
+        matrix[i][j] = matrix[i][j] - m1.matrix[i][j];
+
+    return this;
+  }
+
+  template <typename intType, enIf<std::is_integral<intType>>>
+  matrix2* multiply(intType integral) {
+    for (size_t i = 0; i < sizeY; ++i)
+      for (size_t j = 0; j < sizeX; ++j) matrix[i][j] = matrix[i][j] * integral;
+
+    return this;
+  }
 };
 
 /// @brief Adds two matrices together. Commutative.
@@ -116,16 +172,14 @@ class matrix2 {
 /// @param m2 Matrix to add.
 /// @return Sum.
 matrix2 matrixAdd(matrix2 m1, matrix2 m2) {
-  if (m1.sizeX != m2.sizeX && m1.sizeY != m2.sizeY)
+  if (m1.sizeX != m2.sizeX || m1.sizeY != m2.sizeY)
     throw std::invalid_argument("NoSolution");
 
   matrix2 m3(m1.sizeX, m1.sizeY);
 
-  for (size_t i = 0; i < m1.sizeY; ++i) {
-    for (size_t j = 0; j < m1.sizeX; ++j) {
+  for (size_t i = 0; i < m1.sizeY; ++i)
+    for (size_t j = 0; j < m1.sizeX; ++j)
       m3.matrix[i][j] = m1.matrix[i][j] + m2.matrix[i][j];
-    }
-  }
 
   return m3;
 }
@@ -140,11 +194,9 @@ matrix2 matrixSub(matrix2 m1, matrix2 m2) {
 
   matrix2 m3(m1.sizeX, m1.sizeY);
 
-  for (size_t i = 0; i < m1.sizeY; ++i) {
-    for (size_t j = 0; j < m1.sizeX; ++j) {
+  for (size_t i = 0; i < m1.sizeY; ++i)
+    for (size_t j = 0; j < m1.sizeX; ++j)
       m3.matrix[i][j] = m1.matrix[i][j] - m2.matrix[i][j];
-    }
-  }
 
   return m3;
 }
@@ -157,11 +209,10 @@ matrix2 matrixSub(matrix2 m1, matrix2 m2) {
 template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
 matrix2 matrixMult(arithType toMult, matrix2 m1) {
   matrix2 m3(m1.sizeY, m1.sizeX);
-  for (std::size_t i = 0; i < m1.sizeY; ++i) {
-    for (std::size_t j = 0; j < m1.sizeX; ++j) {
+  for (std::size_t i = 0; i < m1.sizeY; ++i)
+    for (std::size_t j = 0; j < m1.sizeX; ++j)
       m3.matrix[j][i] = m1.matrix[j][i] * toMult;
-    }
-  }
+
   return m3;
 }
 
@@ -173,28 +224,26 @@ matrix2 matrixMult(arithType toMult, matrix2 m1) {
 template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
 matrix2 matrixMult(matrix2 m1, arithType toMult) {
   matrix2 m3(m1.sizeY, m1.sizeX);
-  for (std::size_t i = 0; i < m1.sizeY; ++i) {
-    for (std::size_t j = 0; j < m1.sizeX; ++j) {
+
+  for (std::size_t i = 0; i < m1.sizeY; ++i)
+    for (std::size_t j = 0; j < m1.sizeX; ++j)
       m3.matrix[j][i] = m1.matrix[j][i] * toMult;
-    }
-  }
+
   return m3;
 }
 
-// FIXME - Doesn't fckng work
 matrix2 matrixMult(matrix2 m1, matrix2 m2) {
   if (m1.sizeX != m2.sizeY) {
     throw std::invalid_argument("NoSolution");
   }
 
-  matrix2 m3(m1.sizeY, m1.sizeX);
+  matrix2 m3(m1.sizeY, m2.sizeX);
 
-  for (int i = 0; i < m1.sizeX; ++i) {
-    for (int j = 0; j < m2.sizeY; ++j) {
+  for (int i = 0; i < m3.sizeY; ++i) {
+    for (int j = 0; j < m3.sizeX; ++j) {
       m3.matrix[i][j] = 0;
-      for (int ii = 0; ii < m1.sizeY; ++ii) {
-        m3.matrix[i][j] += m1.matrix[i][ii] * m2.matrix[ii][i];
-      }
+      for (int ii = 0; ii < m2.sizeY; ++ii)
+        m3.matrix[i][j] += m1.matrix[i][ii] * m2.matrix[ii][j];
     }
   }
 
@@ -204,6 +253,3 @@ matrix2 matrixMult(matrix2 m1, matrix2 m2) {
 }  // namespace sstd
 
 #endif /* MATRIX_HPP */
-
-// Write a function to multiply two matrices, assuming the matrices are 2
-// dimensional vectors.

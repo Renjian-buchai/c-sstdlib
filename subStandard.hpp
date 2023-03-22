@@ -27,7 +27,7 @@
 #ifndef SSTD_HPP
 #define SSTD_HPP
 
-#include "io.hpp"
+#include "io/io.hpp"
 #include "math/math.hpp"
 
 #endif /* SSTD_HPP */

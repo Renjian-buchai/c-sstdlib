@@ -36,8 +36,8 @@
  * numbers. The aim of this header is for precise yet flexible integral
  * calculations.
  *
- * However, since not all calculations can be done on integrals, this does
- * provide the functionality to:
+ * However, since not all calculations can be done on integrals, this header
+ * does provide the functionality to:
  * - Convert fractions to long doubles.
  *
  * List of utility included:
@@ -53,7 +53,7 @@
  * Of the above, fractions are simplified automatically by default.
  *
  * Hopefully to be implemented:
- * TODO - Convert double to fractions.
+ * TODO - Convert floating point numbers to fractions.
  * TODO - Optional way to disable fractions
  */
 
@@ -74,9 +74,9 @@ namespace sstd {
 /// @note mathutils.hpp -> sstd::hcf();
 class fraction {
  public:
-  long long numerator;
-  long long denominator;
-  long long quotient;
+  long long numerator = 0;
+  long long denominator = 1;
+  long long quotient = 0;
 
   /// @brief Defines an improper fraction.
   /// @param numr Numerator; The top number in a fraction.
@@ -125,9 +125,9 @@ class fraction {
   }
 
   /// @brief Prints this as an improper fraction.
-  void printImproper() {
+  void printFraction() {
     if (0 != quotient) {
-      this->toImproper();
+      this->toFraction();
     }
 
     std::cout << numerator << " / " << denominator << "\n";
@@ -136,7 +136,7 @@ class fraction {
   }
 
   /// @brief Converts this to an improper fraction.
-  void toImproper() {
+  void toFraction() {
     if (0 == quotient) {
       return;
     }
@@ -165,7 +165,7 @@ class fraction {
   /// @return Returns this as a decimal.
   long double toDec() {
     if (0 != quotient) {
-      this->toImproper();
+      this->toFraction();
     }
 
     return (numerator / denominator);
@@ -176,7 +176,7 @@ class fraction {
   /// @note Dependencies:
   /// @note mathutils.hpp -> sstd::hcf();
   void simplify() {
-    this->toImproper();
+    this->toFraction();
     long long hcf = sstd::hcf(numerator, denominator);
     numerator = numerator / hcf;
     denominator = denominator / hcf;
@@ -190,8 +190,8 @@ class fraction {
 /// @param f2 Fraction to add.
 /// @return Sum, in simplest terms.
 fraction fractionAdd(fraction f1, fraction f2) {
-  f1.toImproper();
-  f2.toImproper();
+  f1.toFraction();
+  f2.toFraction();
 
   fraction f3(f1.numerator + f2.numerator, f1.denominator);
 
@@ -210,7 +210,7 @@ fraction fractionAdd(fraction f1, fraction f2) {
 /// @param toAdd Integer to be added.
 /// @return Sum, in simplest terms.
 fraction fractionAdd(fraction f1, long long toAdd) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(f1.numerator + toAdd * f1.denominator, f1.denominator);
   f3.simplify();
@@ -223,7 +223,7 @@ fraction fractionAdd(fraction f1, long long toAdd) {
 /// @param f1 Fraction to be added.
 /// @return Sum, in simplest terms.
 fraction fractionAdd(long long toAdd, fraction f1) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(f1.numerator + toAdd * f1.denominator, f1.denominator);
   f3.simplify();
@@ -236,8 +236,8 @@ fraction fractionAdd(long long toAdd, fraction f1) {
 /// @param f2 Fraction to be subtracted.
 /// @return Difference, in simplest terms.
 fraction fractionSub(fraction f1, fraction f2) {
-  f1.toImproper();
-  f2.toImproper();
+  f1.toFraction();
+  f2.toFraction();
 
   fraction f3(f1.numerator - f2.numerator, f1.denominator);
 
@@ -256,7 +256,7 @@ fraction fractionSub(fraction f1, fraction f2) {
 /// @param toSub Integer to subtract.
 /// @return Difference, in simplest terms.
 fraction fractionSub(fraction f1, long long toSub) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(f1.numerator - toSub * f1.denominator, f1.denominator);
   f3.simplify();
@@ -269,7 +269,7 @@ fraction fractionSub(fraction f1, long long toSub) {
 /// @param f1 Fraction to subtract.
 /// @return Difference, in simplest terms.
 fraction fractionSub(long long toSub, fraction f1) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(toSub * f1.denominator - f1.numerator, f1.denominator);
   f3.simplify();
@@ -282,8 +282,8 @@ fraction fractionSub(long long toSub, fraction f1) {
 /// @param f2 Fraction to multiply by.
 /// @return Product, in simplest terms.
 fraction fractionMult(fraction f1, fraction f2) {
-  f1.toImproper();
-  f2.toImproper();
+  f1.toFraction();
+  f2.toFraction();
 
   fraction f3(f1.numerator * f2.numerator, f1.denominator * f2.denominator);
   f3.simplify();
@@ -296,7 +296,7 @@ fraction fractionMult(fraction f1, fraction f2) {
 /// @param toMult Integer to multiply by.
 /// @return Product, in simplest terms.
 fraction fractionMult(fraction f1, long long toMult) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(f1.numerator * toMult, f1.denominator);
   f3.simplify();
@@ -309,7 +309,7 @@ fraction fractionMult(fraction f1, long long toMult) {
 /// @param f1 Fraction to multiply by.
 /// @return Product, in simplest terms.
 fraction fractionMult(long long toMult, fraction f1) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(f1.numerator * toMult, f1.denominator);
   f3.simplify();
@@ -322,8 +322,8 @@ fraction fractionMult(long long toMult, fraction f1) {
 /// @param f2 Fraction to divide by.
 /// @return Division, in simplest terms.
 fraction fractionDiv(fraction f1, fraction f2) {
-  f1.toImproper();
-  f2.toImproper();
+  f1.toFraction();
+  f2.toFraction();
 
   fraction f3(f1.numerator * f2.denominator, f2.denominator * f1.numerator);
   f3.simplify();
@@ -336,7 +336,7 @@ fraction fractionDiv(fraction f1, fraction f2) {
 /// @param toDiv Integer to divide by.
 /// @return Division, in simplest terms.
 fraction fractionDiv(fraction f1, long long toDiv) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(f1.numerator, f1.denominator * toDiv);
   f3.simplify();
@@ -349,7 +349,7 @@ fraction fractionDiv(fraction f1, long long toDiv) {
 /// @param f1 Integer to divide by.
 /// @return Division, in simplest terms.
 fraction fractionDiv(long long toDiv, fraction f1) {
-  f1.toImproper();
+  f1.toFraction();
 
   fraction f3(toDiv * f1.denominator, f1.numerator);
   f3.simplify();
