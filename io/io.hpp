@@ -24,10 +24,9 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_HPP
-#define SSTD_HPP
+#ifndef IO_HPP
+#define IO_HPP
 
-#include "io/io.hpp"
-#include "math/math.hpp"
+#include "printCont.hpp"
 
-#endif /* SSTD_HPP */
+#endif /* IO_HPP */
