@@ -24,11 +24,7 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_IO_HPP
-#define SSTDIO_HPP
+#ifndef SSTD_DATASTRUCT_HPP
+#define SSTD_DATASTRUCT_HPP
 
-#include "assert.hpp"
-#include "log.hpp"
-#include "printCont.hpp"
-
-#endif /* IO_HPP */
+#endif

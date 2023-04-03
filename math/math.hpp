@@ -24,9 +24,11 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef MATH_HPP
-#define MATH_HPP
+#ifndef SSTD_MATH_HPP
+#define SSTD_MATH_HPP
 
+#include "const.hpp"
+#include "conversion.hpp"
 #include "fraction.hpp"
 #include "mathutils.hpp"
 #include "matrix.hpp"

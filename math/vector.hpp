@@ -24,11 +24,24 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_IO_HPP
-#define SSTDIO_HPP
+#ifndef SSTD_VECTOR_HPP
+#define SSTD_VECTOR_HPP
 
-#include "assert.hpp"
-#include "log.hpp"
-#include "printCont.hpp"
+namespace sstd {
 
-#endif /* IO_HPP */
+class vector2 {
+ public:
+  long double X;
+  long double Y;
+
+  vector2() {
+    X = 0;
+    Y = 0;
+    return;
+  }
+
+  vector2(long double _X, long double _Y) {}
+};
+
+}  // namespace sstd
+#endif

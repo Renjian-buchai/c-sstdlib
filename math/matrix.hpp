@@ -24,8 +24,8 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef SSTD_MATRIX_HPP
+#define SSTD_MATRIX_HPP
 
 #include <array>
 #include <cstdlib>
