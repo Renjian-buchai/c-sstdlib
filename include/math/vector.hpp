@@ -24,7 +24,24 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_DATASTRUCT_HPP
-#define SSTD_DATASTRUCT_HPP
+#ifndef SSTD_VECTOR_HPP
+#define SSTD_VECTOR_HPP
 
+namespace sstd {
+
+class vector2 {
+ public:
+  long double X;
+  long double Y;
+
+  vector2() {
+    X = 0;
+    Y = 0;
+    return;
+  }
+
+  vector2(long double _X, long double _Y) {}
+};
+
+}  // namespace sstd
 #endif

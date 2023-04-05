@@ -27,7 +27,9 @@
  *
  * Header for fraction handling.
  *
- * An implementation similar to std::ratio that is closer to mathematics.
+ * An implementation similar to std::ratio that is closer to mathematics than
+ * std::ratio. Note: Fractions are not mutated when performing operations.
+ *
  */
 
 #ifndef SSTD_FRACTION_HPP
@@ -36,7 +38,6 @@
 #include <cmath>
 #include <exception>
 #include <iostream>
-#include <ratio>
 #include <system_error>
 
 #include "mathutils.hpp"
@@ -49,11 +50,12 @@ namespace sstd {
 /// @note Dependencies:
 /// @note mathutils.hpp -> sstd::hcf();
 class fraction {
- public:
+ private:
   long long numerator = 0;
   long long denominator = 1;
   long long quotient = 0;
 
+ public:
   /// @brief Default
   fraction() {
     numerator = 0;
@@ -67,14 +69,10 @@ class fraction {
   /// @param denr Denominator; The bottom number in a fraction.
   /// @throws std::invalid_argument "DivideBy0Error" when denr is 0
   fraction(long long numr, long long denr) {
-    if (denr == 0) {
-      throw(std::invalid_argument("DivideBy0Error"));
-    }
-
+    if (denr == 0) throw(std::invalid_argument("DivideBy0Error"));
     denominator = denr;
     numerator = numr;
     quotient = 0;
-
     return;
   }
 
@@ -85,15 +83,10 @@ class fraction {
   /// @param numr The top number in the fraction of the mixed number.
   /// @param denr The bottom number in the fraction of the mixed number.
   fraction(long long quot, long long numr, long long denr) {
-    if (denr == 0) {
-      throw(std::invalid_argument("DivideBy0Error"));
-      return;
-    }
-
+    if (denr == 0) throw(std::invalid_argument("DivideBy0Error"));
     numerator = numr;
     denominator = denr;
     quotient = quot;
-
     return;
   }
 
@@ -106,47 +99,41 @@ class fraction {
   template <typename floatType, enIf<std::is_floating_point<floatType>>>
   void fromDec(floatType decimal, std::size_t precision = 8,
                bool simplify = true) {
-    if (quotient == 0 && numerator == 0 && denominator == 1) {
+    if (quotient == numerator == 0 && denominator == 1) {
       numerator = (int)(decimal * std::pow(10, precision));
       denominator = std::pow(10, precision);
       quotient = 0;
     }
     if (simplify) this->simplify();
-
     return;
   }
 
   /// @brief Prints this as a mixed number.
   void printMixed() {
-    if (0 == quotient) {
-      this->toMixed();
-    }
-
-    std::cout << quotient << ", " << numerator << " / " << denominator << "\n";
-
+    if (0 == quotient) this->toMixed();
+    if (denominator == 1)
+      std::cout << quotient << "\n";
+    else
+      std::cout << quotient << ", " << numerator << " / " << denominator
+                << "\n";
     return;
   }
 
   /// @brief Prints this as an improper fraction.
   void printFraction() {
-    if (0 != quotient) {
-      this->toFraction();
-    }
-
-    std::cout << numerator << " / " << denominator << "\n";
-
+    if (0 != quotient) this->toFraction();
+    if (denominator == 1)
+      std::cout << numerator << "\n";
+    else
+      std::cout << numerator << " / " << denominator << "\n";
     return;
   }
 
   /// @brief Converts this to an improper fraction.
   void toFraction() {
-    if (0 == quotient) {
-      return;
-    }
-
+    if (0 == quotient) return;
     numerator += quotient * denominator;
     quotient = 0;
-
     return;
   }
 
@@ -154,23 +141,16 @@ class fraction {
   /// @note Avoid when possible. Forces a conversion before calculations,
   /// decreasing efficiency.
   void toMixed() {
-    if (0 != quotient) {
-      return;
-    }
-
+    if (0 != quotient) return;
     quotient = floor(numerator / denominator);
     numerator -= denominator * quotient;
-
     return;
   }
 
   /// @brief Converts this to decimal.
   /// @return Returns this as a decimal.
   long double toDec() {
-    if (0 != quotient) {
-      this->toFraction();
-    }
-
+    if (0 != quotient) this->toFraction();
     return (numerator / denominator);
   }
 
@@ -183,12 +163,6 @@ class fraction {
     long long highest = hcf(numerator, denominator);
     numerator = numerator / highest;
     denominator = denominator / highest;
-    if ((numerator == 2) && (denominator == 2) && (quotient == 0)) {
-      numerator = 1;
-      denominator = 1;
-      quotient = 0;
-    }
-
     return;
   }
 
@@ -196,7 +170,7 @@ class fraction {
   /// @param f1 Fraction to add.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Sum, in simplest terms.
-  fraction fractionAdd(fraction f1, bool simplify = true) {
+  fraction add(fraction f1, bool simplify = true) {
     f1.toFraction();
     this->toFraction();
     fraction f3(f1.numerator + numerator, f1.denominator);
@@ -204,8 +178,8 @@ class fraction {
       f3.numerator =
           (denominator * f1.numerator) + (f1.denominator * numerator);
       f3.denominator = f1.denominator * denominator;
-      if (simplify) f3.simplify();
     }
+    if (simplify) f3.simplify();
     return f3;
   }
 
@@ -213,7 +187,7 @@ class fraction {
   /// @param toAdd Integer to be added.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Sum, in simplest terms.
-  fraction fractionAdd(long long toAdd, bool simplify = true) {
+  fraction add(long long toAdd, bool simplify = true) {
     this->toFraction();
     fraction f3(numerator + toAdd * denominator, denominator);
     if (simplify) f3.simplify();
@@ -225,7 +199,7 @@ class fraction {
   /// @return Difference, in simplest terms.
   /// @note If you want to subtract this fraction from another, call this method
   /// from the other.
-  fraction fractionSub(fraction f1, bool simplify = true) {
+  fraction sub(fraction f1, bool simplify = true) {
     this->toFraction();
     f1.toFraction();
     fraction f3(numerator - f1.numerator, denominator);
@@ -233,8 +207,8 @@ class fraction {
       f3.numerator =
           (f1.denominator * numerator) - (denominator * f1.numerator);
       f3.denominator = denominator * f1.denominator;
-      if (simplify) f3.simplify();
     }
+    if (simplify) f3.simplify();
     return f3;
   }
 
@@ -242,7 +216,7 @@ class fraction {
   /// @param toSub Integer to subtract.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Difference, in simplest terms.
-  fraction fractionSub(long long toSub, bool simplify = true) {
+  fraction sub(long long toSub, bool simplify = true) {
     this->toFraction();
     fraction f3(numerator - toSub * denominator, denominator);
     if (simplify) f3.simplify();
@@ -253,7 +227,7 @@ class fraction {
   /// @param toSub Integer to subtract from.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Difference, in simplest terms.
-  fraction subFraction(long long toSub, bool simplify = true) {
+  fraction subInt(long long toSub, bool simplify = true) {
     this->toFraction();
     fraction f3(toSub * denominator - numerator, denominator);
     if (simplify) f3.simplify();
@@ -264,7 +238,7 @@ class fraction {
   /// @param f1 Fraction to multiply by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Product, in simplest terms.
-  fraction fractionMult(fraction f1, bool simplify = true) {
+  fraction mult(fraction f1, bool simplify = true) {
     f1.toFraction();
     this->toFraction();
     fraction f3(f1.numerator * numerator, f1.denominator * denominator);
@@ -276,7 +250,7 @@ class fraction {
   /// @param toMult Integer to multiply by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Product, in simplest terms.
-  fraction fractionMult(long long toMult, bool simplify = true) {
+  fraction mult(long long toMult, bool simplify = true) {
     this->toFraction();
     fraction f3(numerator * toMult, denominator);
     if (simplify) f3.simplify();
@@ -287,13 +261,11 @@ class fraction {
   /// @param f1 Fraction to divide by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
-  fraction fractionDiv(fraction f1, bool simplify = true) {
+  fraction div(fraction f1, bool simplify = true) {
     this->toFraction();
     f1.toFraction();
-
     fraction f3(numerator * f1.denominator, f1.denominator * numerator);
     if (simplify) f3.simplify();
-
     return f3;
   }
 
@@ -302,7 +274,7 @@ class fraction {
   /// @param toDiv Integer to divide by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
-  fraction fractionDiv(long long toDiv, bool simplify = true) {
+  fraction div(long long toDiv, bool simplify = true) {
     this->toFraction();
     fraction f3(numerator, denominator * toDiv);
     if (simplify) f3.simplify();
@@ -314,14 +286,16 @@ class fraction {
   /// @param f1 Integer to divide by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
-  fraction divFraction(long long toDiv, bool simplify = true) {
+  fraction multInv(long long toDiv, bool simplify = true) {
     this->toFraction();
-
     fraction f3(toDiv * denominator, numerator);
     if (simplify) f3.simplify();
-
     return f3;
   }
+
+  long long getNum() { return numerator; }
+  long long getDen() { return denominator; }
+  long long getQuo() { return quotient; }
 };
 
 }  // namespace sstd

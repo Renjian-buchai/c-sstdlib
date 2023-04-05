@@ -27,6 +27,7 @@
 #ifndef SSTD_PRINTCONT_HPP
 #define SSTD_PRINTCONT_HPP
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <forward_list>

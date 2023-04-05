@@ -27,8 +27,6 @@
 #ifndef SSTD_IO_HPP
 #define SSTDIO_HPP
 
-#include "assert.hpp"
-#include "log.hpp"
 #include "printCont.hpp"
 
 #endif /* IO_HPP */
