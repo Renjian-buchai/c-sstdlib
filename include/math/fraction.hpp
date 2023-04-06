@@ -40,7 +40,8 @@
 #include <iostream>
 #include <system_error>
 
-#include "mathutils.hpp"
+template <typename Condition, typename T = void>
+using enIf = typename std::enable_if<Condition::value, T>::type;
 
 using namespace std;
 
@@ -54,6 +55,14 @@ class fraction {
   long long numerator = 0;
   long long denominator = 1;
   long long quotient = 0;
+
+  int hcf(long long x, long long y) {
+    if (x == y) return x;  // guard clause
+    if (x == 0) return y;
+    if (y == 0) return x;
+    if (x > y) return hcf(x - y, y);
+    return hcf(x, y - x);
+  }
 
  public:
   /// @brief Default

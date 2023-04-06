@@ -34,14 +34,10 @@
 #include <random>
 #include <type_traits>
 
-#include "./const.hpp"
-
 /// @brief Template to enable template if Condition evaluates true.
 /// @tparam Condition : condition to evaluate.
 /// @tparam T : template.
 /// @note example: template <typename T, EnableIf<std::is_arithmetic<T>>>
-template <typename Condition, typename T = void>
-using enIf = typename std::enable_if<Condition::value, T>::type;
 
 using namespace std;
 
@@ -71,14 +67,12 @@ unsigned long long lcm(unsigned long long x, unsigned long long y) {
 /// @return Inverse square root.
 /// @warning Undefined behaviour.
 double qisqrt(double x) {
-  long long i;
-  double x2, y;
-  x2 = x * .5;
-  y = x;
-  i = *(long long*)&y;
-  i = 0x5f3759df - (i >> 1);
-  y = *(long double*)&i;
-  y = y * (1.5 - x2 * y * y);
+  double y = x;
+  double x2 = y * 0.5;
+  std::int64_t i = *(std::int64_t *)&y;
+  i = 0x5fe6eb50c7b537a9 - (i >> 1);
+  y = *(double *)&i;
+  y = y * (1.5 - (x2 * y * y));
   return y;
 }
 
@@ -87,15 +81,13 @@ double qisqrt(double x) {
 /// @return Inverse square root.
 /// @warning Undefined behaviour.
 double q_isqrt(double x) {
-  long long i;
-  double x2, y;
-  x2 = x * .5;
-  y = x;
-  i = *(long long*)&y;
-  i = 0x5f3759df - (i >> 1);
-  y = *(long double*)&i;
-  y = y * (1.5 - x2 * y * y);
-  y = y * (1.5 - x2 * y * y);
+  double y = x;
+  double x2 = y * 0.5;
+  std::int64_t i = *(std::int64_t *)&y;
+  i = 0x5fe6eb50c7b537a9 - (i >> 1);
+  y = *(double *)&i;
+  y = y * (1.5 - (x2 * y * y));
+  y = y * (1.5 - (x2 * y * y));
   return y;
 }
 
@@ -104,17 +96,13 @@ double q_isqrt(double x) {
 /// @param precision Precision of estimate.
 /// @return Inverse square root.
 /// @warning Undefined behaviour.
-double qisqrt(double x, unsigned int precision) {
-  long long i;
-  double x2, y;
-  x2 = x * .5;
-  y = x;
-  i = *(long long*)&y;
-  i = 0x5f3759df - (i >> 1);
-  y = *(long double*)&i;
-  for (int k = 0; k < precision + 3; ++k) {
-    y = y * (1.5 - x2 * y * y);
-  }
+double qisqrt(double x, size_t precision) {
+  double y = x;
+  double x2 = y * 0.5;
+  std::int64_t i = *(std::int64_t *)&y;
+  i = 0x5fe6eb50c7b537a9 - (i >> 1);
+  y = *(double *)&i;
+  for (size_t eax = 0; eax < precision; ++eax) y = y * (1.5 - (x2 * y * y));
   return y;
 }
 
@@ -123,9 +111,8 @@ double qisqrt(double x, unsigned int precision) {
 /// @param x Dividend.
 /// @param y Divisor.
 /// @return std::array<intType, 2>. Index 0 is quotient, index 1 is remainder.
-template <typename intType, enIf<std::is_integral<intType>>>
-std::array<intType, 2> divmod(intType x, intType y) {
-  std::array<intType, 2> eax(x, y);
+std::array<long long, 2> divmod(long long x, long long y) {
+  std::array<long long, 2> eax{x, y};
   eax[0] = (int)x / y;
   eax[1] = x % y;
   return eax;

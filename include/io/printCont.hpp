@@ -27,18 +27,12 @@
 #ifndef SSTD_PRINTCONT_HPP
 #define SSTD_PRINTCONT_HPP
 
-#include <algorithm>
-#include <array>
-#include <cmath>
-#include <forward_list>
-#include <iostream>
-#include <list>
-#include <map>
-#include <set>
-#include <vector>
+#include <algorithm>  // std::reverse
+#include <iostream>   // std::cout
 
 namespace sstd {
 
+#ifdef _GLIBCXX_VECTOR  // ? Don't know why this is still being compiled
 /// @brief Prints vector.
 /// @tparam T : Any type.
 /// @param vector Vector to print.
@@ -47,11 +41,15 @@ template <typename T>
 void printVec(std::vector<T> vector, bool reversed = 0) {
   if (reversed) std::reverse(vector.begin(), vector.end());
   std::cout << "{ ";
-  for (T x : vector) std::cout << std::to_string(x) << " ";
+  // iterates through every element in vector, converts it to string then couts
+  // it. Same for everything below.
+  for (T x : vector) std::cout << x << " ";
   std::cout << "}\n";
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_ARRAY  // ? ^ same for this
 /// @brief Prints std::array.
 /// @tparam T : Any type.
 /// @tparam N : Size of array.
@@ -61,10 +59,11 @@ template <typename T, std::size_t N>
 void printArr(std::array<T, N> array, bool reversed = 0) {
   if (reversed) std::reverse(array.begin(), array.end());
   std::cout << "{ ";
-  for (T x : array) std::cout << std::to_string(x) << " ";
+  for (T x : array) std::cout << x << " ";
   std::cout << "}\n";
   return;
 }
+#endif
 
 /// @brief Prints C-style array.
 /// @tparam T : Any type.
@@ -83,6 +82,7 @@ void printArr(T array[], std::size_t size, bool reversed = 0) {
   return;
 }
 
+#ifdef _GLIBCXX_FORWARD_LIST
 /// @brief Prints forward list.
 /// @tparam T : Any type.
 /// @param flist Forward list to print.
@@ -95,7 +95,9 @@ void printlist(std::forward_list<T> flist, bool reversed = 0) {
   std::cout << "]\n";
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_LIST
 /// @brief Prints list.
 /// @tparam T : Any type.
 /// @param list List to print.
@@ -108,7 +110,9 @@ void printlist(std::list<T> list, bool reversed = 0) {
   std::cout << "]\n";
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_MAP
 /// @brief Prints map.
 /// @tparam T : Any type.
 /// @param map Map to print.
@@ -134,7 +138,9 @@ void printMap(std::multimap<T, T> multimap, bool reversed = 0) {
   std::cout << "]\n";
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_SET
 /// @brief Prints set.
 /// @tparam T : Any type.
 /// @param set Set to print.
@@ -160,6 +166,36 @@ void printSet(std::multiset<T> multiset, bool reversed = 0) {
   std::cout << "}\n";
   return;
 }
+#endif
+
+#ifdef SSTD_BINTREE_HPP
+template <class T>
+class binTree {
+  /// @brief Preorder traverses and prints a binary tree.
+  /// @tparam T : Any arithmetic type.
+  /// @param focus Node focus.
+  void prePrintBinTree(node<T>* focus) {
+    if (focus == nullptr) return;
+    std::cout << focus->value << " ";
+    prePrintBinTree(focus->left);
+    prePrintBinTree(focus->right);
+    return;
+  }
+
+  /// @brief Inorder traverses and prints a binary tree.
+  /// @tparam T : Any arithmetic type.
+  /// @param focus Node focus.
+  /// @note Prints from smallest to largest.
+  void inPrintBinTree(node<T>* focus) {
+    if (focus == nullptr) return;
+    inPrintBinTree(focus->left);
+    std::cout << focus->value << " ";
+    inPrintBinTree(focus->right);
+    return;
+  }
+  // TODO Postprint bintree
+};
+#endif
 
 }  // namespace sstd
 

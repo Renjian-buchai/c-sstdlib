@@ -30,10 +30,9 @@
 #include <array>
 #include <cstdlib>
 #include <exception>
+#include <iostream>
 #include <type_traits>
 #include <vector>
-
-#include "mathutils.hpp"
 
 using namespace std;
 
@@ -102,8 +101,8 @@ class matrix2 {
 
   /// @brief Allows user to add matrix values one by one by prompting.
   void cinMatrix() {
-    for (int i = 0; i < sizeY; ++i) {
-      for (int j = 0; j < sizeX; ++j) {
+    for (size_t i = 0; i < sizeY; ++i) {
+      for (size_t j = 0; j < sizeX; ++j) {
         std::cout << "Element " << i + 1 << ", " << j + 1 << ": ";
         std::cin >> matrix[i][j];
       }
@@ -239,10 +238,10 @@ matrix2 matrixMult(matrix2 m1, matrix2 m2) {
 
   matrix2 m3(m1.sizeY, m2.sizeX);
 
-  for (int i = 0; i < m3.sizeY; ++i) {
-    for (int j = 0; j < m3.sizeX; ++j) {
+  for (size_t i = 0; i < m3.sizeY; ++i) {
+    for (size_t j = 0; j < m3.sizeX; ++j) {
       m3.matrix[i][j] = 0;
-      for (int ii = 0; ii < m2.sizeY; ++ii)
+      for (size_t ii = 0; ii < m2.sizeY; ++ii)
         m3.matrix[i][j] += m1.matrix[i][ii] * m2.matrix[ii][j];
     }
   }
