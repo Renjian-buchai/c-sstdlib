@@ -24,9 +24,10 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef MATHUTILS_HPP
-#define MATHUTILS_HPP
+#ifndef SSTD_MATHUTILS_HPP
+#define SSTD_MATHUTILS_HPP
 
+#include <array>
 #include <cstdlib>
 #include <ctime>
 #include <limits>
@@ -37,8 +38,8 @@
 /// @tparam Condition : condition to evaluate.
 /// @tparam T : template.
 /// @note example: template <typename T, EnableIf<std::is_arithmetic<T>>>
-template <typename Condition, typename T = void>
-using enIf = typename std::enable_if<Condition::value, T>::type;
+
+using namespace std;
 
 namespace sstd {
 /// @brief Finds the highest common faction of two positive integers
@@ -46,9 +47,9 @@ namespace sstd {
 /// @param y unsigned long long.
 /// @return Highest common factor of x and y.
 unsigned long long hcf(unsigned long long x, unsigned long long y) {
+  if (x == y) return x;  // guard clause
   if (x == 0) return y;
   if (y == 0) return x;
-  if (x == y) return x;
   if (x > y) return hcf(x - y, y);
   return hcf(x, y - x);
 }
@@ -61,28 +62,17 @@ unsigned long long lcm(unsigned long long x, unsigned long long y) {
   return (x * y) / hcf(x, y);
 }
 
-// TODO Test this lmao
-unsigned long long randomise(unsigned long lower = 0,
-                             unsigned long upper = UINT32_MAX) {
-  std::srand(std::time(nullptr));
-  return (std::rand() + lower) % upper;
-}
-
 /// @brief Quake III quick inverse square root. Single precision.
 /// @param x Value to find inverse square root for.
 /// @return Inverse square root.
 /// @warning Undefined behaviour.
 double qisqrt(double x) {
-  long long i;
-  double x2, y;
-
-  x2 = x * .5;
-  y = x;
-  i = *(long long*)&y;
-  i = 0x5f3759df - (i >> 1);
-  y = *(long double*)&i;
-  y = y * (1.5 - x2 * y * y);
-
+  double y = x;
+  double x2 = y * 0.5;
+  std::int64_t i = *(std::int64_t *)&y;
+  i = 0x5fe6eb50c7b537a9 - (i >> 1);
+  y = *(double *)&i;
+  y = y * (1.5 - (x2 * y * y));
   return y;
 }
 
@@ -91,17 +81,13 @@ double qisqrt(double x) {
 /// @return Inverse square root.
 /// @warning Undefined behaviour.
 double q_isqrt(double x) {
-  long long i;
-  double x2, y;
-
-  x2 = x * .5;
-  y = x;
-  i = *(long long*)&y;
-  i = 0x5f3759df - (i >> 1);
-  y = *(long double*)&i;
-  y = y * (1.5 - x2 * y * y);
-  y = y * (1.5 - x2 * y * y);
-
+  double y = x;
+  double x2 = y * 0.5;
+  std::int64_t i = *(std::int64_t *)&y;
+  i = 0x5fe6eb50c7b537a9 - (i >> 1);
+  y = *(double *)&i;
+  y = y * (1.5 - (x2 * y * y));
+  y = y * (1.5 - (x2 * y * y));
   return y;
 }
 
@@ -110,35 +96,26 @@ double q_isqrt(double x) {
 /// @param precision Precision of estimate.
 /// @return Inverse square root.
 /// @warning Undefined behaviour.
-double qisqrt(double x, unsigned int precision) {
-  long long i;
-  double x2, y;
-
-  x2 = x * .5;
-  y = x;
-  i = *(long long*)&y;
-  i = 0x5f3759df - (i >> 1);
-  y = *(long double*)&i;
-  for (int k = 0; k < precision + 3; ++k) {
-    y = y * (1.5 - x2 * y * y);
-  }
-
+double qisqrt(double x, size_t precision) {
+  double y = x;
+  double x2 = y * 0.5;
+  std::int64_t i = *(std::int64_t *)&y;
+  i = 0x5fe6eb50c7b537a9 - (i >> 1);
+  y = *(double *)&i;
+  for (size_t eax = 0; eax < precision; ++eax) y = y * (1.5 - (x2 * y * y));
   return y;
 }
 
-/// @brief SSE inverse square root.
-/// @param x Value to find inverse square root for.
-/// @return Inverse square root.
-/// @note Faster than qisqrt, but only accepts single-precision floating point
-/// values. I don't know how to convert this to accept double-precision floating
-/// point values. No undefined behaviour, though.
-/// @note F in fisqrt stands for float and fast.
-float fisqrt(float x) {
-  __m128 _srcReisger = _mm_set1_ps(x);
-  __m128 _dstRegister = _mm_rsqrt_ps(_srcReisger);
-  float array[4];
-  _mm_storeu_ps(array, _dstRegister);
-  return array[0];
+/// @brief Finds the quotient and remainder of a function.
+/// @tparam intType : Any integral value.
+/// @param x Dividend.
+/// @param y Divisor.
+/// @return std::array<intType, 2>. Index 0 is quotient, index 1 is remainder.
+std::array<long long, 2> divmod(long long x, long long y) {
+  std::array<long long, 2> eax{x, y};
+  eax[0] = (int)x / y;
+  eax[1] = x % y;
+  return eax;
 }
 
 }  // namespace sstd

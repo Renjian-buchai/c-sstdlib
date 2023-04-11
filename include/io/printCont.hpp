@@ -24,177 +24,149 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef PRINTCONT_HPP
-#define PRINTCONT_HPP
+#ifndef SSTD_PRINTCONT_HPP
+#define SSTD_PRINTCONT_HPP
 
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <deque>
-#include <forward_list>
-#include <iostream>
-#include <list>
-#include <map>
-#include <queue>
-#include <set>
-#include <stack>
-#include <vector>
+#include <algorithm>  // std::reverse
+#include <iostream>   // std::cout
 
 namespace sstd {
 
+#ifdef _GLIBCXX_VECTOR  // ? Don't know why this is still being compiled
 /// @brief Prints vector.
 /// @tparam T : Any type.
 /// @param vector Vector to print.
+/// @param reversed Whether to reverse vector.
 template <typename T>
-void printVec(std::vector<T> vector) {
+void printVec(std::vector<T> vector, bool reversed = 0) {
+  if (reversed) std::reverse(vector.begin(), vector.end());
   std::cout << "{ ";
-  for (auto it = vector.begin(); it != vector.end(); ++it)
-    std::cout << *it << " ";
+  // iterates through every element in vector, converts it to string then couts
+  // it. Same for everything below.
+  for (T x : vector) std::cout << x << " ";
   std::cout << "}\n";
-
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_ARRAY  // ? ^ same for this
 /// @brief Prints std::array.
 /// @tparam T : Any type.
 /// @tparam N : Size of array.
 /// @param array std::array to print.
+/// @param reversed Whether to reverse std::array.
 template <typename T, std::size_t N>
-void printArr(std::array<T, N> array) {
+void printArr(std::array<T, N> array, bool reversed = 0) {
+  if (reversed) std::reverse(array.begin(), array.end());
   std::cout << "{ ";
-  for (auto it = array.begin(); it != array.end(); ++it)
-    std::cout << *it << " ";
+  for (T x : array) std::cout << x << " ";
   std::cout << "}\n";
-
   return;
 }
+#endif
 
 /// @brief Prints C-style array.
 /// @tparam T : Any type.
 /// @param array C-style array to print.
 /// @param size Size of array.
+/// @param reversed Whether to reverse C-style array.
 template <typename T>
-void printArr(T array[], std::size_t size) {
+void printArr(T array[], std::size_t size, bool reversed = 0) {
   std::cout << "{ ";
-  for (size_t i = 0; i < size; ++i) std::cout << array[i] << " ";
+  if (reversed) {
+    for (size_t i = size; i > 0; --i) std::cout << array[i] << " ";
+  } else {
+    for (size_t i = 0; i < size; ++i) std::cout << array[i] << " ";
+  }
   std::cout << "}\n";
-
   return;
 }
 
+#ifdef _GLIBCXX_FORWARD_LIST
 /// @brief Prints forward list.
 /// @tparam T : Any type.
 /// @param flist Forward list to print.
+/// @param reversed Whether to reverse forward list.
 template <typename T>
-void printlist(std::forward_list<T> flist) {
+void printlist(std::forward_list<T> flist, bool reversed = 0) {
+  if (reversed) std::reverse(flist.begin(), flist.end());
   std::cout << "[ ";
-  for (auto it = flist.begin(); it != flist.end(); ++it)
-    std::cout << *it << " ";
+  for (T x : flist) std::cout << x << " ";
   std::cout << "]\n";
-
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_LIST
 /// @brief Prints list.
 /// @tparam T : Any type.
 /// @param list List to print.
+/// @param reversed Whether to reverse list.
 template <typename T>
-void printlist(std::list<T> list) {
+void printlist(std::list<T> list, bool reversed = 0) {
+  if (reversed) std::reverse(list.begin(), list.end());
   std::cout << "[ ";
-  for (auto it = list.begin(); it != list.end(); ++it) std::cout << *it << " ";
+  for (T x : list) std::cout << x << " ";
   std::cout << "]\n";
-
   return;
 }
+#endif
 
-/// @brief Prints queue.
-/// @tparam T : Any type.
-/// @param queue Queue to print.
-template <typename T>
-void printQ(std::queue<T> queue) {
-  std::cout << "< ";
-  for (auto it = queue.begin(); it != queue.end(); ++it)
-    std::cout << *it << " ";
-  std::cout << ">\n";
-
-  return;
-}
-
-/// @brief Prints priority queue.
-/// @tparam T : Any type.
-/// @param queue Priority queue to print.
-template <typename T>
-void printQ(std::priority_queue<T> queue) {
-  std::cout << "< ";
-  for (auto it = queue.begin(); it != queue.end(); ++it)
-    std::cout << *it << " ";
-  std::cout << ">\n";
-
-  return;
-}
-
-/// @brief Prints deque.
-/// @tparam T : Any type.
-/// @param queue Deque to print.
-template <typename T>
-void printQ(std::deque<T> queue) {
-  std::cout << "< ";
-  for (auto it = queue.begin(); it != queue.end(); ++it)
-    std::cout << *it << " ";
-  std::cout << ">\n";
-
-  return;
-}
-
+#ifdef _GLIBCXX_MAP
 /// @brief Prints map.
 /// @tparam T : Any type.
 /// @param map Map to print.
+/// @param reversed Whether to reverse map.
 template <typename T>
-void printMap(std::map<T, T> map) {
+void printMap(std::map<T, T> map, bool reversed = 0) {
+  if (reversed) std::reverse(map.begin(), map.end());
   std::cout << "[ ";
-  for (auto it = map.begin(); it != map.end(); ++it) std::cout << *it << " ";
+  for (T x : map) std::cout << x << " ";
   std::cout << "]\n";
-
   return;
 }
 
 /// @brief Prints multimap.
 /// @tparam T : Any type.
 /// @param multimap Multimap to print.
+/// @param reversed Whether to reverse multimap.
 template <typename T>
-void printMap(std::multimap<T, T> multimap) {
+void printMap(std::multimap<T, T> multimap, bool reversed = 0) {
+  if (reversed) std::reverse(multimap.begin(), multimap.end());
   std::cout << "[ ";
-  for (auto it = multimap.begin(); it != multimap.end(); ++it)
-    std::cout << *it << " ";
+  for (T x : multimap) std::cout << x << " ";
   std::cout << "]\n";
-
   return;
 }
+#endif
 
+#ifdef _GLIBCXX_SET
 /// @brief Prints set.
 /// @tparam T : Any type.
 /// @param set Set to print.
+/// @param reversed Whether to reverse set.
 template <typename T>
-void printSet(std::set<T> set) {
+void printSet(std::set<T> set, bool reversed = 0) {
+  if (reversed) std::reverse(set.begin(), set.end());
   std::cout << "{ ";
-  for (auto it = set.begin(); it != set.end(); ++it) std::cout << *it << " ";
-  std::cout << "}\n";
-
+  for (T x : set) std::cout << x << " ";
+  std::cout << "]\n";
   return;
 }
 
 /// @brief Prints multiset.
 /// @tparam T : Any type.
 /// @param multiset Multiset to print.
+/// @param reversed Whether to reverse multiset.
 template <typename T>
-void printSet(std::multiset<T> multiset) {
+void printSet(std::multiset<T> multiset, bool reversed = 0) {
+  if (reversed) std::reverse(multiset.begin(), multiset.end());
   std::cout << "{ ";
-  for (auto it = multiset.begin(); it != multiset.end(); ++it)
-    std::cout << *it << " ";
+  for (T x : multiset) std::cout << x << " ";
   std::cout << "}\n";
-
   return;
 }
+#endif
 
 }  // namespace sstd
 

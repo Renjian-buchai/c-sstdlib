@@ -24,11 +24,9 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef MATH_HPP
-#define MATH_HPP
+#ifndef SSTD_IO_HPP
+#define SSTDIO_HPP
 
-#include "fraction.hpp"
-#include "mathutils.hpp"
-#include "matrix.hpp"
+#include <io/printCont.hpp>
 
-#endif /* MATH_HPP */
+#endif /* IO_HPP */

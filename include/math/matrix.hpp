@@ -24,26 +24,28 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef SSTD_MATRIX_HPP
+#define SSTD_MATRIX_HPP
 
 #include <array>
 #include <cstdlib>
 #include <exception>
+#include <iostream>
 #include <type_traits>
 #include <vector>
-
-#include "mathutils.hpp"
 
 using namespace std;
 
 namespace sstd {
 
+/// @brief 2-dimensional matrix.
+/// @tparam T : Any anithmetic type.
+template <class T>
 class matrix2 {
  public:
   std::size_t sizeX = 1;
   std::size_t sizeY = 1;
-  std::vector<std::vector<long double>> matrix;
+  std::vector<std::vector<T>> matrix;
 
   /// @brief Generates matrix of size sizeY * sizeX.
   /// @param _sizeY sizeY
@@ -67,13 +69,10 @@ class matrix2 {
   }
 
   /// @brief Fills matrix with values.
-  /// @tparam arithType : Must be an arithmetic type.
   /// @param valueSet The values to fill matrix with. The vector must be of
   /// size: sizeY * sizeX.
   /// @note Dependenies:
-  /// @note mathutils.hpp -> enIf (template arg)
-  template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
-  void fillMatrix(std::vector<arithType> valueSet) {
+  void fillMatrix(std::vector<T> valueSet) {
     auto it = valueSet.begin();
     for (int i = 0; i < matrix.size(); ++i) {
       for (int j = 0; j < matrix[i].size(); ++j) {
@@ -89,8 +88,7 @@ class matrix2 {
   /// @tparam arithType : Must be an arithmetic type.
   /// @param valueSet The values to fill matrix with. The vector must be of
   /// size: sizeX, and the vector vect must be of size: sizeY.
-  template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
-  void fillMatrix(std::vector<std::vector<arithType>> valueSet) {
+  void fillMatrix(std::vector<std::vector<T>> valueSet) {
     for (int i = 0; i < matrix.size(); ++i) {
       for (int j = 0; j < matrix[i].size(); ++j) {
         matrix[i][j] = valueSet[i][j];
@@ -102,8 +100,8 @@ class matrix2 {
 
   /// @brief Allows user to add matrix values one by one by prompting.
   void cinMatrix() {
-    for (int i = 0; i < sizeY; ++i) {
-      for (int j = 0; j < sizeX; ++j) {
+    for (size_t i = 0; i < sizeY; ++i) {
+      for (size_t j = 0; j < sizeX; ++j) {
         std::cout << "Element " << i + 1 << ", " << j + 1 << ": ";
         std::cin >> matrix[i][j];
       }
@@ -171,11 +169,12 @@ class matrix2 {
 /// @param m1 Matrix to be added to.
 /// @param m2 Matrix to add.
 /// @return Sum.
-matrix2 matrixAdd(matrix2 m1, matrix2 m2) {
+template <typename T>
+matrix2<T> matrixAdd(matrix2<T> m1, matrix2<T> m2) {
   if (m1.sizeX != m2.sizeX || m1.sizeY != m2.sizeY)
     throw std::invalid_argument("NoSolution");
 
-  matrix2 m3(m1.sizeX, m1.sizeY);
+  matrix2<T> m3(m1.sizeX, m1.sizeY);
 
   for (size_t i = 0; i < m1.sizeY; ++i)
     for (size_t j = 0; j < m1.sizeX; ++j)
@@ -188,11 +187,12 @@ matrix2 matrixAdd(matrix2 m1, matrix2 m2) {
 /// @param m1 Matrix to subtract from.
 /// @param m2 Matrix to be subtracted.
 /// @return Difference
-matrix2 matrixSub(matrix2 m1, matrix2 m2) {
+template <typename T>
+matrix2<T> matrixSub(matrix2<T> m1, matrix2<T> m2) {
   if (m1.sizeX != m2.sizeX && m1.sizeY != m2.sizeY)
     throw std::invalid_argument("NoSolution");
 
-  matrix2 m3(m1.sizeX, m1.sizeY);
+  matrix2<T> m3(m1.sizeX, m1.sizeY);
 
   for (size_t i = 0; i < m1.sizeY; ++i)
     for (size_t j = 0; j < m1.sizeX; ++j)
@@ -206,9 +206,9 @@ matrix2 matrixSub(matrix2 m1, matrix2 m2) {
 /// @param toMult Scalar to multiply matrix with.
 /// @param m1 Matrix to be multiplied.
 /// @return Product.
-template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
-matrix2 matrixMult(arithType toMult, matrix2 m1) {
-  matrix2 m3(m1.sizeY, m1.sizeX);
+template <typename T>
+matrix2<T> matrixMult(T toMult, matrix2<T> m1) {
+  matrix2<T> m3(m1.sizeY, m1.sizeX);
   for (std::size_t i = 0; i < m1.sizeY; ++i)
     for (std::size_t j = 0; j < m1.sizeX; ++j)
       m3.matrix[j][i] = m1.matrix[j][i] * toMult;
@@ -221,9 +221,9 @@ matrix2 matrixMult(arithType toMult, matrix2 m1) {
 /// @param m1 Matrix to be multiplied.
 /// @param toMult Scalar to multiply matrix with.
 /// @return Product.
-template <typename arithType, typename = enIf<std::is_arithmetic<arithType>>>
-matrix2 matrixMult(matrix2 m1, arithType toMult) {
-  matrix2 m3(m1.sizeY, m1.sizeX);
+template <typename T>
+matrix2<T> matrixMult(matrix2<T> m1, T toMult) {
+  matrix2<T> m3(m1.sizeY, m1.sizeX);
 
   for (std::size_t i = 0; i < m1.sizeY; ++i)
     for (std::size_t j = 0; j < m1.sizeX; ++j)
@@ -232,22 +232,39 @@ matrix2 matrixMult(matrix2 m1, arithType toMult) {
   return m3;
 }
 
-matrix2 matrixMult(matrix2 m1, matrix2 m2) {
+/// @brief Multiplies two matrices.
+/// @tparam T : An arithmetic type.
+/// @param m1 Matrix to multiply.
+/// @param m2 Matrix to be multiplied.
+/// @return Product.
+template <typename T>
+matrix2<T> matrixMult(matrix2<T> m1, matrix2<T> m2) {
   if (m1.sizeX != m2.sizeY) {
     throw std::invalid_argument("NoSolution");
   }
 
-  matrix2 m3(m1.sizeY, m2.sizeX);
+  matrix2<T> m3(m1.sizeY, m2.sizeX);
 
-  for (int i = 0; i < m3.sizeY; ++i) {
-    for (int j = 0; j < m3.sizeX; ++j) {
+  for (size_t i = 0; i < m3.sizeY; ++i) {
+    for (size_t j = 0; j < m3.sizeX; ++j) {
       m3.matrix[i][j] = 0;
-      for (int ii = 0; ii < m2.sizeY; ++ii)
+      for (size_t ii = 0; ii < m2.sizeY; ++ii)
         m3.matrix[i][j] += m1.matrix[i][ii] * m2.matrix[ii][j];
     }
   }
 
   return m3;
+}
+
+/// @brief Gets an identity matrix of size size.
+/// @tparam T : An arithmetic type.
+/// @param size Size of identity matrix.
+/// @return Identity matrix.
+template <typename T>
+matrix2<T> idMat(int size) {
+  matrix2<T> matrix(size, size);
+  for (int i = 0; i < size; ++i) matrix.matrix[size][size] = 1;
+  return matrix;
 }
 
 }  // namespace sstd
