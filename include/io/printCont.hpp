@@ -168,35 +168,6 @@ void printSet(std::multiset<T> multiset, bool reversed = 0) {
 }
 #endif
 
-#ifdef SSTD_BINTREE_HPP
-template <class T>
-class binTree {
-  /// @brief Preorder traverses and prints a binary tree.
-  /// @tparam T : Any arithmetic type.
-  /// @param focus Node focus.
-  void prePrintBinTree(node<T>* focus) {
-    if (focus == nullptr) return;
-    std::cout << focus->value << " ";
-    prePrintBinTree(focus->left);
-    prePrintBinTree(focus->right);
-    return;
-  }
-
-  /// @brief Inorder traverses and prints a binary tree.
-  /// @tparam T : Any arithmetic type.
-  /// @param focus Node focus.
-  /// @note Prints from smallest to largest.
-  void inPrintBinTree(node<T>* focus) {
-    if (focus == nullptr) return;
-    inPrintBinTree(focus->left);
-    std::cout << focus->value << " ";
-    inPrintBinTree(focus->right);
-    return;
-  }
-  // TODO Postprint bintree
-};
-#endif
-
 }  // namespace sstd
 
 #endif

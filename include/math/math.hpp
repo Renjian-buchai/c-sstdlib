@@ -27,10 +27,10 @@
 #ifndef SSTD_MATH_HPP
 #define SSTD_MATH_HPP
 
-#include "const.hpp"
-#include "conversion.hpp"
-#include "fraction.hpp"
-#include "mathutils.hpp"
-#include "matrix.hpp"
+#include <math/const.hpp>
+#include <math/conversion.hpp>
+#include <math/fraction.hpp>
+#include <math/mathutils.hpp>
+#include <math/matrix.hpp>
 
 #endif /* MATH_HPP */

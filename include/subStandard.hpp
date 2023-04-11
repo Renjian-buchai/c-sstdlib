@@ -27,8 +27,8 @@
 #ifndef SSTD_HPP
 #define SSTD_HPP
 
-#include "dataStruct/dataStruct.hpp"
-#include "io/io.hpp"
-#include "math/math.hpp"
+#include <dataStruct/dataStruct.hpp>
+#include <io/io.hpp>
+#include <math/math.hpp>
 
 #endif /* SSTD_HPP */

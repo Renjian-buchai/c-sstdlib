@@ -35,6 +35,7 @@
 #ifndef SSTD_FRACTION_HPP
 #define SSTD_FRACTION_HPP
 
+#include <boost/integer/common_factor.hpp>
 #include <cmath>
 #include <exception>
 #include <iostream>
@@ -55,14 +56,6 @@ class fraction {
   long long numerator = 0;
   long long denominator = 1;
   long long quotient = 0;
-
-  int hcf(long long x, long long y) {
-    if (x == y) return x;  // guard clause
-    if (x == 0) return y;
-    if (y == 0) return x;
-    if (x > y) return hcf(x - y, y);
-    return hcf(x, y - x);
-  }
 
  public:
   /// @brief Default
@@ -169,27 +162,27 @@ class fraction {
   /// @note mathutils.hpp -> sstd::highest();
   void simplify() {
     this->toFraction();
-    long long highest = hcf(numerator, denominator);
+    long long highest = boost::integer::gcd(numerator, denominator);
     numerator = numerator / highest;
     denominator = denominator / highest;
     return;
   }
 
   /// @brief Adds a fraction to another fraction. Commutative.
-  /// @param f1 Fraction to add.
+  /// @param _fraction Fraction to add.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Sum, in simplest terms.
-  fraction add(fraction f1, bool simplify = true) {
-    f1.toFraction();
+  fraction add(fraction _fraction, bool simplify = true) {
+    _fraction.toFraction();
     this->toFraction();
-    fraction f3(f1.numerator + numerator, f1.denominator);
-    if (f1.denominator != denominator) {
-      f3.numerator =
-          (denominator * f1.numerator) + (f1.denominator * numerator);
-      f3.denominator = f1.denominator * denominator;
+    fraction _res_frac(_fraction.numerator + numerator, _fraction.denominator);
+    if (_fraction.denominator != denominator) {
+      _res_frac.numerator = (denominator * _fraction.numerator) +
+                            (_fraction.denominator * numerator);
+      _res_frac.denominator = _fraction.denominator * denominator;
     }
-    if (simplify) f3.simplify();
-    return f3;
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Adds an integer to a fraction. Commutative.
@@ -198,27 +191,27 @@ class fraction {
   /// @return Sum, in simplest terms.
   fraction add(long long toAdd, bool simplify = true) {
     this->toFraction();
-    fraction f3(numerator + toAdd * denominator, denominator);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(numerator + toAdd * denominator, denominator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Subtracts a fraction from another. Not commutative.
-  /// @param f1 Fraction to be subtracted.
+  /// @param _fraction Fraction to be subtracted.
   /// @return Difference, in simplest terms.
   /// @note If you want to subtract this fraction from another, call this method
   /// from the other.
-  fraction sub(fraction f1, bool simplify = true) {
+  fraction sub(fraction _fraction, bool simplify = true) {
     this->toFraction();
-    f1.toFraction();
-    fraction f3(numerator - f1.numerator, denominator);
-    if (denominator != f1.denominator) {
-      f3.numerator =
-          (f1.denominator * numerator) - (denominator * f1.numerator);
-      f3.denominator = denominator * f1.denominator;
+    _fraction.toFraction();
+    fraction _res_frac(numerator - _fraction.numerator, denominator);
+    if (denominator != _fraction.denominator) {
+      _res_frac.numerator = (_fraction.denominator * numerator) -
+                            (denominator * _fraction.numerator);
+      _res_frac.denominator = denominator * _fraction.denominator;
     }
-    if (simplify) f3.simplify();
-    return f3;
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Subtracts an integer from a fraction. Not commutative.
@@ -227,32 +220,33 @@ class fraction {
   /// @return Difference, in simplest terms.
   fraction sub(long long toSub, bool simplify = true) {
     this->toFraction();
-    fraction f3(numerator - toSub * denominator, denominator);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(numerator - toSub * denominator, denominator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Subtracts a fraction from an integer. Not commutative.
   /// @param toSub Integer to subtract from.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Difference, in simplest terms.
-  fraction subInt(long long toSub, bool simplify = true) {
+  fraction subFr(long long toSub, bool simplify = true) {
     this->toFraction();
-    fraction f3(toSub * denominator - numerator, denominator);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(toSub * denominator - numerator, denominator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Multiplies a fraction by another fraction. Commutative.
-  /// @param f1 Fraction to multiply by.
+  /// @param _fraction Fraction to multiply by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Product, in simplest terms.
-  fraction mult(fraction f1, bool simplify = true) {
-    f1.toFraction();
+  fraction mult(fraction _fraction, bool simplify = true) {
+    _fraction.toFraction();
     this->toFraction();
-    fraction f3(f1.numerator * numerator, f1.denominator * denominator);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(_fraction.numerator * numerator,
+                       _fraction.denominator * denominator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Multiplies a fraction by an integer. Commutative.
@@ -261,51 +255,206 @@ class fraction {
   /// @return Product, in simplest terms.
   fraction mult(long long toMult, bool simplify = true) {
     this->toFraction();
-    fraction f3(numerator * toMult, denominator);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(numerator * toMult, denominator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Divides a fraction by another fraction. Not commutative.
-  /// @param f1 Fraction to divide by.
+  /// @param _fraction Fraction to divide by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
-  fraction div(fraction f1, bool simplify = true) {
+  fraction div(fraction _fraction, bool simplify = true) {
     this->toFraction();
-    f1.toFraction();
-    fraction f3(numerator * f1.denominator, f1.denominator * numerator);
-    if (simplify) f3.simplify();
-    return f3;
+    _fraction.toFraction();
+    fraction _res_frac(numerator * _fraction.denominator,
+                       _fraction.denominator * numerator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Divides a fraction by an integer. Not commutatitve.
-  /// @param f1 Fraction to be divided.
   /// @param toDiv Integer to divide by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
   fraction div(long long toDiv, bool simplify = true) {
     this->toFraction();
-    fraction f3(numerator, denominator * toDiv);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(numerator, denominator * toDiv);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   /// @brief Divides an integer by a fraction. Not commutative.
   /// @param toDiv Integer to be divided.
-  /// @param f1 Integer to divide by.
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
-  fraction multInv(long long toDiv, bool simplify = true) {
+  fraction divBy(long long toDiv, bool simplify = true) {
     this->toFraction();
-    fraction f3(toDiv * denominator, numerator);
-    if (simplify) f3.simplify();
-    return f3;
+    fraction _res_frac(toDiv * denominator, numerator);
+    if (simplify) _res_frac.simplify();
+    return _res_frac;
   }
 
   long long getNum() { return numerator; }
   long long getDen() { return denominator; }
   long long getQuo() { return quotient; }
 };
+
+/// @brief Adds a fraction to an integer. Commutative.
+/// @param toAdd Integer to be added to.
+/// @param _base_frac Fraction to be added.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Sum, in simplest terms.
+fraction add(fraction _base_frac, long long toAdd, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(_base_frac.getNum() + toAdd * _base_frac.getDen(),
+                     _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Adds an integer to a fraction. Commutative.
+/// @param _base_frac Fraction to be added to.
+/// @param toAdd Integer to be added.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Sum, in simplest terms.
+fraction add(long long toAdd, fraction _base_frac, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(_base_frac.getNum() + toAdd * _base_frac.getDen(),
+                     _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Adds a fraction to another fraction. Commutative.
+/// @param _base_frac Fraction to be added to.
+/// @param _fraction Fraction to be added.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Sum, in simplest terms.
+fraction add(fraction _base_frac, fraction _fraction, bool simplify = true) {
+  _base_frac.toFraction();
+  _fraction.toFraction();
+  long long numerator = _base_frac.getNum() + _fraction.getNum();
+  long long denominator = _base_frac.getDen();
+  if (_base_frac.getDen() != _fraction.getDen()) {
+    numerator = (_fraction.getDen() * _base_frac.getNum()) +
+                (_base_frac.getDen() * _fraction.getNum());
+    denominator = _base_frac.getDen() * _fraction.getDen();
+  }
+  fraction _res_frac(numerator, denominator);
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Subtracts a fraction from another. Not commutative.
+/// @param _base_frac Fraction to be subtracted from.
+/// @param _fraction Fraction to be subtracted.
+/// @return Difference, in simplest terms.
+/// @note If you want to subtract this fraction from another, call this method
+/// from the other.
+fraction sub(fraction _base_frac, fraction _fraction, bool simplify = true) {
+  _base_frac.toFraction();
+  _fraction.toFraction();
+  long long numerator = _base_frac.getNum() - _fraction.getNum();
+  long long denominator = _base_frac.getDen();
+  if (_base_frac.getDen() != _fraction.getDen()) {
+    numerator = (_fraction.getDen() * _base_frac.getNum()) -
+                (_base_frac.getDen() * _fraction.getNum());
+    denominator = _base_frac.getDen() * _fraction.getDen();
+  }
+  fraction _res_frac(numerator, denominator);
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Subtracts an integer from a fraction. Not commutative.
+/// @param _base_frac Fraction to be subtracted from.
+/// @param toSub Integer to be subtracted.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Difference, in simplest terms.
+fraction sub(fraction _base_frac, long long toSub, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(_base_frac.getNum() - toSub * _base_frac.getDen(),
+                     _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Multiplies a fraction by another fraction. Commutative.
+/// @param _base_frac Fraction to be multiplied.
+/// @param _fraction Fraction to multiply by.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Product, in simplest terms.
+fraction mult(fraction _base_frac, fraction _fraction, bool simplify = true) {
+  _base_frac.toFraction();
+  _fraction.toFraction();
+  fraction _res_frac(_fraction.getNum() * _base_frac.getNum(),
+                     _fraction.getDen() * _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Multiplies a fraction by an integer. Commutative.
+/// @param _base_frac Fraction to be multiplied.
+/// @param toMult Integer to multiply by.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Product, in simplest terms.
+fraction mult(fraction _base_frac, long long toMult, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(_base_frac.getNum() * toMult, _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Multiplies a fraction by an integer. Commutative.
+/// @param toMult Integer to multiply by.
+/// @param _base_frac Fraction to be multiplied.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Product, in simplest terms.
+fraction mult(long long toMult, fraction _base_frac, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(_base_frac.getNum() * toMult, _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Divides a fraction by another fraction. Not commutative.
+/// @param _base_frac Fraction to be divided.
+/// @param _fraction Fraction to divide by.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Division, in simplest terms.
+fraction div(fraction _base_frac, fraction _fraction, bool simplify = true) {
+  _base_frac.toFraction();
+  _fraction.toFraction();
+  fraction _res_frac(_base_frac.getNum() * _fraction.getDen(),
+                     _fraction.getNum() * _base_frac.getDen());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Divides a fraction by an integer. Not commutatitve.
+/// @param _base_frac Fraction to be divided.
+/// @param toDiv Integer to divide by.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Division, in simplest terms.
+fraction div(fraction _base_frac, long long toDiv, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(_base_frac.getNum(), _base_frac.getDen() * toDiv);
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
+
+/// @brief Divides an integer by a fraction. Not commutative.
+/// @param toDiv Integer to be divided.
+/// @param _base_frac Integer to divide by.
+/// @param simplify Whether to simplify. Default = true.
+/// @return Division, in simplest terms.
+fraction div(long long toDiv, fraction _base_frac, bool simplify = true) {
+  _base_frac.toFraction();
+  fraction _res_frac(toDiv * _base_frac.getDen(), _base_frac.getNum());
+  if (simplify) _res_frac.simplify();
+  return _res_frac;
+}
 
 }  // namespace sstd
 
