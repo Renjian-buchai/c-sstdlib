@@ -24,11 +24,9 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_HPP)
-#define SSTD_HPP
+#if !defined(SSTD_EXCEPTION_HPP)
+#define SSTD_EXCEPTION_HPP
 
-#include <sstd/dataStruct.hpp>
-#include <sstd/io.hpp>
-#include <sstd/math.hpp>
+#include <sstd/except/invCall.hpp>
 
-#endif /* SSTD_HPP */
+#endif

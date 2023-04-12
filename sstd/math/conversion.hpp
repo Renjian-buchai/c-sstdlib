@@ -24,10 +24,10 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_CONVERSION_HPP
+#if !defined(SSTD_CONVERSION_HPP)
 #define SSTD_CONVERSION_HPP
 
-#ifndef _PI_
+#if !defined(_PI_)
 #define _PI_ \
   3.1415926535'8979323846'2643383279'5028841971'6939937510'5820974944'5923078164'0628620899'8628034825'3421170679
 #endif

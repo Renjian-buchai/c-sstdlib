@@ -24,11 +24,13 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_HPP)
-#define SSTD_HPP
+#if !defined(SSTD_MATH_HPP)
+#define SSTD_MATH_HPP
 
-#include <sstd/dataStruct.hpp>
-#include <sstd/io.hpp>
-#include <sstd/math.hpp>
+#include <sstd/math/const.hpp>
+#include <sstd/math/conversion.hpp>
+#include <sstd/math/fraction.hpp>
+#include <sstd/math/mathutils.hpp>
+#include <sstd/math/matrix.hpp>
 
-#endif /* SSTD_HPP */
+#endif /* MATH_HPP */

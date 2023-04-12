@@ -24,7 +24,7 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_CONSTANTS_HPP
+#if !defined(SSTD_CONSTANTS_HPP)
 #define SSTD_CONSTANTS_HPP
 
 #include <cmath>
