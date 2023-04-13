@@ -24,7 +24,7 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_MATHUTILS_HPP
+#if !defined(SSTD_MATHUTILS_HPP)
 #define SSTD_MATHUTILS_HPP
 
 #include <array>

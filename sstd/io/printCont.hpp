@@ -24,7 +24,7 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_PRINTCONT_HPP
+#if !defined(SSTD_PRINTCONT_HPP)
 #define SSTD_PRINTCONT_HPP
 
 #include <algorithm>  // std::reverse
@@ -32,7 +32,7 @@
 
 namespace sstd {
 
-#ifdef _GLIBCXX_VECTOR  // ? Don't know why this is still being compiled
+#if defined(_GLIBCXX_VECTOR)  // ? Don't know why this is still being compiled
 /// @brief Prints vector.
 /// @tparam T : Any type.
 /// @param vector Vector to print.
@@ -49,7 +49,7 @@ void printVec(std::vector<T> vector, bool reversed = 0) {
 }
 #endif
 
-#ifdef _GLIBCXX_ARRAY  // ? ^ same for this
+#if defined(_GLIBCXX_ARRAY)  // ? ^ same for this
 /// @brief Prints std::array.
 /// @tparam T : Any type.
 /// @tparam N : Size of array.
@@ -82,7 +82,7 @@ void printArr(T array[], std::size_t size, bool reversed = 0) {
   return;
 }
 
-#ifdef _GLIBCXX_FORWARD_LIST
+#if defined(_GLIBCXX_FORWARD_LIST)
 /// @brief Prints forward list.
 /// @tparam T : Any type.
 /// @param flist Forward list to print.
@@ -97,7 +97,7 @@ void printlist(std::forward_list<T> flist, bool reversed = 0) {
 }
 #endif
 
-#ifdef _GLIBCXX_LIST
+#if defined(_GLIBCXX_LIST)
 /// @brief Prints list.
 /// @tparam T : Any type.
 /// @param list List to print.
@@ -112,7 +112,7 @@ void printlist(std::list<T> list, bool reversed = 0) {
 }
 #endif
 
-#ifdef _GLIBCXX_MAP
+#if defined(_GLIBCXX_MAP)
 /// @brief Prints map.
 /// @tparam T : Any type.
 /// @param map Map to print.
@@ -140,7 +140,7 @@ void printMap(std::multimap<T, T> multimap, bool reversed = 0) {
 }
 #endif
 
-#ifdef _GLIBCXX_SET
+#if defined(_GLIBCXX_SET)
 /// @brief Prints set.
 /// @tparam T : Any type.
 /// @param set Set to print.

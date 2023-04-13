@@ -24,13 +24,9 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_MATH_HPP
-#define SSTD_MATH_HPP
+#if !defined(SSTD_DATASTRUCT_HPP)
+#define SSTD_DATASTRUCT_HPP
 
-#include <math/const.hpp>
-#include <math/conversion.hpp>
-#include <math/fraction.hpp>
-#include <math/mathutils.hpp>
-#include <math/matrix.hpp>
+#include <sstd/dataStruct/binaryTree.hpp>
 
-#endif /* MATH_HPP */
+#endif
