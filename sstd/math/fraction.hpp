@@ -40,7 +40,7 @@
 #include <cmath>
 #include <exception>
 #include <iostream>
-#include <sstd/except/invCall.hpp>
+#include <sstd/except/invCall.hpp>  // sstd::invCall
 #include <system_error>
 
 template <typename Condition, typename T = void>
@@ -72,7 +72,7 @@ class fraction {
   /// @throws std::invalid_argument "DivideBy0Error" when denr is 0
   fraction(long long numr, long long denr) {
     // By definition, denr is the number to divide numr by, thf divideby0error
-    if (denr == 0) throw(std::invalid_argument("DivideBy0Error"));
+    if (denr == 0) throw new std::invalid_argument("DivideBy0Error");
     denominator = denr;
     numerator = numr;
     quotient = 0;
@@ -87,7 +87,7 @@ class fraction {
   /// @param denr The bottom number in the fraction of the mixed number.
   fraction(long long quot, long long numr, long long denr) {
     // Same as in fraction::fraction(long long, long long)
-    if (denr == 0) throw(std::invalid_argument("DivideBy0Error"));
+    if (denr == 0) throw new std::invalid_argument("DivideBy0Error");
     numerator = numr;
     denominator = denr;
     quotient = quot;
@@ -113,7 +113,12 @@ class fraction {
     } else
       throw invCall("Fraction is not empty");
     //        ^^ For docs, see sstd::invCall.hpp
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+      return;
+    };
     return;
   }
 
@@ -121,7 +126,10 @@ class fraction {
 
   /// @brief Prints this as a mixed number.
   void printMixed() {
-    this->toMixed();  // Short circuits if already mixed.
+    if (0 == quotient) {  // A fraction will have 0 in the quotient slot.
+      quotient = floor(numerator / denominator);
+      numerator -= denominator * quotient;
+    }
 
     // Prints whole number if denominator is 1. If denominator == 1, numerator
     // should be 0, so just pryinting quotient is enough.
@@ -135,7 +143,12 @@ class fraction {
 
   /// @brief Prints this as an improper fraction.
   void printFraction() {
-    this->toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // See fraction::printMixed(). The numerator replaces the quotient.
     if (denominator == 1)
@@ -168,17 +181,13 @@ class fraction {
 
   /// @brief Converts this to decimal.
   /// @return Returns this as a decimal.
-  long double toDec() {
-    this->toFraction();                // short circuits if already mixed.
-    return (numerator / denominator);  // Definition of fraction.
-  }
+  long double toDec() { return quotient + (numerator / denominator); }
 
   /// @brief Simplifies this fraction.
   /// @warning Fraction is implicitly converted to improper fraction.
   /// @note Dependencies:
   /// @note mathutils.hpp -> sstd::highest();
   void simplify() {
-    this->toFraction();  // Short circuits if already fraction.
     long long highest = boost::integer::gcd(numerator, denominator);
     numerator = numerator / highest;
     denominator = denominator / highest;
@@ -191,7 +200,12 @@ class fraction {
   /// @return Sum, in simplest terms.
   fraction* add(fraction _fraction, bool simplify = true) {
     _fraction.toFraction();  // Short circuits if already fraction.
-    this->toFraction();      // Above.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b + c / d,
     // Initialises it as a + b / c to save time if c == d.
@@ -202,7 +216,11 @@ class fraction {
                   (_fraction.denominator * numerator);
       denominator = _fraction.denominator * denominator;
     }
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -211,12 +229,21 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Sum, in simplest terms.
   fraction* add(long long toAdd, bool simplify = true) {
-    this->toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b + c,
     // a / b + c = (a + bc) / b
     numerator = numerator + toAdd * denominator;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -226,8 +253,13 @@ class fraction {
   /// @note If you want to subtract this fraction from another, call this method
   /// from the other.
   fraction* sub(fraction _fraction, bool simplify = true) {
-    this->toFraction();      // Short circuits if already fraction.
-    _fraction.toFraction();  // Above.
+    _fraction.toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b - c / d,
     // Initialises it as a - b / c to save time if c == d.
@@ -238,7 +270,11 @@ class fraction {
                   (denominator * _fraction.numerator);
       denominator = denominator * _fraction.denominator;
     }
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -247,12 +283,21 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Difference, in simplest terms.
   fraction* sub(long long toSub, bool simplify = true) {
-    this->toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b - c,
     // a / b - c = (a - bc) / b
     numerator = numerator - toSub * denominator;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -261,12 +306,21 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Difference, in simplest terms.
   fraction* subFr(long long toSub, bool simplify = true) {
-    this->toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given c - a / b,
     // c - a / b = (bc - a) / b
     numerator = toSub * denominator - numerator;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -275,14 +329,23 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Product, in simplest terms.
   fraction* mult(fraction _fraction, bool simplify = true) {
-    _fraction.toFraction();  // Short circuits if alrready fraction.
-    this->toFraction();      // Above.
+    _fraction.toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b * c / d,
     // a / b * c / d = ac / bd
     numerator = _fraction.numerator * numerator;
     denominator = _fraction.denominator * denominator;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -291,12 +354,21 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Product, in simplest terms.
   fraction* mult(long long toMult, bool simplify = true) {
-    this->toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b * c,
     // a / b * c = ac / b
     numerator = numerator * toMult;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -306,13 +378,22 @@ class fraction {
   /// @return Division, in simplest terms.
   fraction* div(fraction _fraction, bool simplify = true) {
     _fraction.toFraction();  // Short circuits if already fraction.
-    this->toFraction();      // Above.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b / (c / d),
     // a / b / (c / d) = ad / bc
     numerator = numerator * _fraction.denominator;
     denominator = _fraction.denominator * numerator;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -321,12 +402,21 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
   fraction* div(long long toDiv, bool simplify = true) {
-    this->toFraction();  // Short circuits if already fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given a / b / c,
     // a / b / c = a / bc
     denominator = denominator * toDiv;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -335,13 +425,22 @@ class fraction {
   /// @param simplify Whether to simplify. Default = true.
   /// @return Division, in simplest terms.
   fraction* divBy(long long toDiv, bool simplify = true) {
-    this->toFraction();  // Short circuits if already a fraction.
+    // A mixed number must have a value in quotient. A mixed number with 0 in
+    // the quotient slot might as well be an improper fraction.
+    if (0 != quotient) {
+      numerator += quotient * denominator;
+      quotient = 0;
+    }
 
     // Given c / (a / b),
     // c / (a / b) = bc / a
     numerator = toDiv * denominator;
     denominator = numerator;
-    if (simplify) this->simplify();
+    if (simplify) {
+      long long highest = boost::integer::gcd(numerator, denominator);
+      numerator = numerator / highest;
+      denominator = denominator / highest;
+    }
     return this;
   }
 
@@ -359,9 +458,6 @@ class fraction {
   /// @return Quotient.
   long long getQuo() { return quotient; }
 };
-
-// NOTE - Below function's definitions have a corresponding method in class
-// sstd::fraction.
 
 /// @brief Adds a fraction to an integer. Commutative.
 /// @param toAdd Integer to be added to.

@@ -54,28 +54,30 @@
 #define _RYD_ 2.179'872'361'103'542
 // Vacuum magnetic permeability.  14 significant figures (NA-1).
 #define _MU0_ 1.256'637'062'121'9 * std::pow(10, -6)
-// 1/File construct constant.     12 significant figures (NULL).
-#define _FCC_ 137.035'999'084'21
 // Electron mass.                 13 significant figures (kg).
 #define _Me_ 9.109'383'701'528 * std::pow(10, -31)
+// 1/File construct constant.     12 significant figures (NULL).
+#define _FCC_ 137.035'999'084'21
 // Fine construct constant.       12 significant figures (NULL)
 #define _fcc_ 0.00729'735'256'286
 // Elementary charge.             10 significant figures (C).
 #define _ELC_ 1.602'176'634 * std::pow(10, -19)
-// Reduced planck constant.       10 significant figures (JHz-1).
-#define _HCT_ (_H_ / _PI_) * std::pow(10, -34)
 // Magnetic flux quantum.         10 significant figures (HzV-1).
 #define _MFQ_ 2.067'833'848 * std::pow(10, -15)
 // Vacuum electric permutivity.   10 significant figures (Fm-1)
 #define _EP0_ 8.854'187'812 * std::pow(10, -12)
+// Reduced planck constant.       10 significant figures (JHz-1).
+#define _HCT_ (_H_ / _PI_) * std::pow(10, -34)
 // Planck constant.               10 significant figures (JHz-1).
 #define _H_ 6.626'070'150 * std::pow(10, -34)
 // Gravitational constant.        8 significant figures  (m3kg-1s-2)
 #define _G_ 6.674'301'5 * std::pow(10, -11)
+
+// Pseudoconstants (Not constant, but commonly used.)
 // Gravity (Earth).               6 significant figures  (ms-2)
 #define _g_ 9.806'65
 
-// Further constants
+// Others
 // Mole.                          9 significant figures  (NULL)
 #define _mol_ 6.022'140'76 * std::pow(10, 23)
 

@@ -46,6 +46,7 @@
 #include <vector>
 
 // TODO Add reason
+// TODO Compose everything if app
 
 template <typename Condition, typename T = void>
 using enIf = typename std::enable_if<Condition::value, T>::type;

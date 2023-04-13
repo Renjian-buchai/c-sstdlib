@@ -27,43 +27,81 @@
 #if !defined(SSTD_CONVERSION_HPP)
 #define SSTD_CONVERSION_HPP
 
+#include <type_traits>
+
 #if !defined(_PI_)
 #define _PI_ \
   3.1415926535'8979323846'2643383279'5028841971'6939937510'5820974944'5923078164'0628620899'8628034825'3421170679
 #endif
 
+#define RECIPROCALOF180 \
+  0.5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555
+#define RECIPROCALOF200 0.005
+#define RECPIROCALOFPI \
+  0.3183098861'8379067153'7767526745'0287240689'1929148091'2897495334'6881177935'9526845307'0180227605'5325061719
+
+template <typename Condition, typename T = void>
+using enIf = typename std::enable_if<Condition::value, T>::type;
+
 namespace sstd {
 
 /// @brief Converts degrees to radians.
 /// @param degree Angle in degrees.
+/// @tparam floatType : Any floating point type
 /// @return Angle in radians.
-long double dTR(long double degree) { return degree * _PI_ / 180; }
+template <typename floatType, enIf<std::is_floating_point<floatType>>>
+floatType dTR(floatType degree) {
+  return degree * _PI_ * RECIPROCALOF180;
+}
 
 /// @brief Converts degrees to gradians.
 /// @param degree Angle in degrees.
+/// @tparam floatType : Any floating point type
 /// @return Angle in gradians.
-long double dTG(long double degree) { return degree / 360 * 400; }
+template <typename floatType, enIf<std::is_floating_point<floatType>>>
+floatType dTG(floatType degree) {
+  return degree * 200 * RECIPROCALOF180;
+}
 
 /// @brief Converts radians to degrees.
 /// @param radian Angle in radians.
+/// @tparam floatType : Any floating point type
 /// @return Angle in degrees.
-long double rTD(long double radian) { return radian * 180 / _PI_; }
+template <typename floatType, enIf<std::is_floating_point<floatType>>>
+floatType rTD(floatType radian) {
+  return radian * 180 / _PI_;
+}
 
 /// @brief Converts radians to gradians.
 /// @param radian Angle in radians.
+/// @tparam floatType : Any floating point type
 /// @return Angle in gradians.
-long double rTG(long double radian) { return radian * 200 / _PI_; }
+template <typename floatType, enIf<std::is_floating_point<floatType>>>
+floatType rTG(floatType radian) {
+  return radian * 200 / _PI_;
+}
 
 /// @brief Converts gradians to radians.
 /// @param gradian Angle in gradians.
-/// @return Angle in radians.
-long double gTR(long double gradian) { return gradian * _PI_ / 200; }
+/// @tparam floatType : Any floating point type
+/// @return Angle in radians
+template <typename floatType, enIf<std::is_floating_point<floatType>>>
+floatType gTR(floatType gradian) {
+  return gradian * _PI_ * RECIPROCALOF200;
+}
 
 /// @brief Converts radians to gradians.
 /// @param gradian Angle in gradians.
+/// @tparam floatType : Any floating point type
 /// @return Angle in radians.
-long double gTD(long double gradian) { return gradian * 0.9; }
+template <typename floatType, enIf<std::is_floating_point<floatType>>>
+floatType gTD(floatType gradian) {
+  return gradian * 0.9;
+}
 
 }  // namespace sstd
+
+#undef R180
+#undef R200
 
 #endif
