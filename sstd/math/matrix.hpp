@@ -169,6 +169,12 @@ class matrix2 {
   /// @brief Gets matrix.
   /// @return Matrix.
   matrix2 getMatrix() { return matrix; };
+
+  /// @brief Returns size of matrix in an array in format (x, y).
+  /// @return Array containing size of matrix.
+  std::array<size_t, 2> size() {
+    return std::array<size_t, 2> { matrix.size(), matrix[0].size() }
+  }
 };
 
 /// @brief Adds a matrix to another. Commutative.

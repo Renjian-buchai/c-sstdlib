@@ -25,8 +25,8 @@
  */
 
 #if !defined(SSTD_IO_HPP)
-#define SSTDIO_HPP
+#define SSTD_IO_HPP
 
-#include <sstd/io/printCont.hpp>
+#include <sstd/.io/printCont.hpp>
 
 #endif /* IO_HPP */

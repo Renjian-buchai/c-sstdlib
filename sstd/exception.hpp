@@ -27,6 +27,7 @@
 #if !defined(SSTD_EXCEPTION_HPP)
 #define SSTD_EXCEPTION_HPP
 
+#include <sstd/except/div0.hpp>
 #include <sstd/except/invCall.hpp>
 
 #endif

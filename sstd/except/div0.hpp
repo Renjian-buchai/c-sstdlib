@@ -24,9 +24,21 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_DATASTRUCT_HPP
-#define SSTD_DATASTRUCT_HPP
+#if !defined(SSTD_DIV0_HPP)
+#define SSTD_DIV0_HPP
 
-#include "binaryTree.hpp"
+#include <stdexcept>
+
+class div0 : std::exception {
+ private:
+  char* message = (char*)"DivideByZeroError";  // Typecast to remove warning
+
+ public:
+  div0() = default;
+
+  div0(char* _message) { message = _message; }
+
+  char* what() { return message; }
+};
 
 #endif
