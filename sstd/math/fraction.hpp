@@ -22,25 +22,36 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
- *
- * ============================================================================
- *
+ */
+
+/*
  * Header for fraction handling.
  *
  * An implementation similar to std::ratio that is closer to mathematics than
  * std::ratio. Note: Fractions are not mutated when running functions. Frections
  * ARE modified when running methods.
  *
+ * NOTE Made decision to compose instead of extract functions like
+ * fraction::simplify because something like that is faster.
+ * Justification: This is a library, so efficiency is more important than
+ * maintainability.
+ *
+ * Guideline:
+ * - When possible, multiply by fractions or integers instead of floats.
  */
 
 #if !defined(SSTD_FRACTION_HPP)
 #define SSTD_FRACTION_HPP
 
 #include <boost/integer/common_factor.hpp>  // boost::integer::gcd
+#include <cctype>
 #include <cmath>
 #include <exception>
 #include <iostream>
+#include <memory>
+#include <sstd/except/div0.hpp>     // sstd::div0
 #include <sstd/except/invCall.hpp>  // sstd::invCall
+#include <string>
 #include <system_error>
 
 template <typename Condition, typename T = void>
@@ -48,571 +59,559 @@ using enIf = typename std::enable_if<Condition::value, T>::type;
 
 namespace sstd {
 
-/// @brief Fraction class. Supports both mixed numbers and improper fractions.
-/// @note Dependencies:
-/// @note mathutils.hpp -> sstd::hcf();
+bool sstd_fraction_simplify = true;
+
+/// @brief Configures fraction data.
+/// @param simplify Whether to simplify fractions.
+/// true = simplify, false = do not simplify. Default=true
+void configureFraction(bool simplify) { sstd_fraction_simplify = simplify; }
+
+/// @brief Class fraction.
+/// @tparam T : Only makes sense if you put an integer type. Float types make it
+/// less precise.
+template <class T = long>
 class fraction {
  private:
-  long long numerator = 0;
-  long long denominator = 1;
-  long long quotient = 0;
+  T numr = 0;
+  T denr = 1;
+  T quot = 0;
 
  public:
-  /// @brief Default
-  fraction() {
-    numerator = 0;
-    denominator = 1;
-    quotient = 0;
+  // ANCHOR Constructor
+
+  /// @brief Initialises an empty fraction (Numerator = 0, denominator = 1,
+  /// quotient = 0)
+  fraction() = default;
+
+  /// @brief Initialises a fraction.
+  /// @param numerator Numerator of new fraction.
+  /// @param denominator Denominator of new fraction.
+  fraction(T numerator, T denominator) {
+    if (denr == 0) throw new div0();
+    numr = numerator;
+    denr = denominator;
+  }
+
+  /// @brief Initialises a mixed number.
+  /// @param quotient Quotient of new fraction.
+  /// @param numerator Numerator of new fraction.
+  /// @param denominator Denominator of new fraction.
+  /// @throw sstd::div0 if denominator == 0.
+  fraction(T quotient, T numerator, T denominator) {
+    if (denr == 0) throw new div0();
+    quot = quotient;
+    numr = numerator;
+    denr = denominator;
     return;
   }
 
-  /// @brief Defines an improper fraction.
-  /// @param numr Numerator; The top number in a fraction.
-  /// @param denr Denominator; The bottom number in a fraction.
-  /// @throws std::invalid_argument "DivideBy0Error" when denr is 0
-  fraction(long long numr, long long denr) {
-    // By definition, denr is the number to divide numr by, thf divideby0error
-    if (denr == 0) throw new std::invalid_argument("DivideBy0Error");
-    denominator = denr;
-    numerator = numr;
-    quotient = 0;
-    return;
-  }
-
-  /// @brief Defines a mixed number.
-  /// @note Avoid when possible. Forces a conversion before calculations,
-  /// decreasing efficiency.
-  /// @param quot The whole number on the left of a mixed number.
-  /// @param numr The top number in the fraction of the mixed number.
-  /// @param denr The bottom number in the fraction of the mixed number.
-  fraction(long long quot, long long numr, long long denr) {
-    // Same as in fraction::fraction(long long, long long)
-    if (denr == 0) throw new std::invalid_argument("DivideBy0Error");
-    numerator = numr;
-    denominator = denr;
-    quotient = quot;
-    return;
-  }
-
-  /// @brief Constructs a fraction from a decimal number. Can only be
-  /// applied to empty or 'zero' fractions. Converts to fractional form by
-  /// default.
-  /// @param decimal Number to be converted to a fraction.
-  /// @param precision Precision of fraction. Default is 1e+6.
-  /// @param simplify Whether to simplify. Default is true.
-  template <typename floatType, enIf<std::is_floating_point<floatType>>>
-  void fromDec(floatType decimal, std::size_t precision = 8,
-               bool simplify = true) {
-    // Checks if the fraction is empty.
-    if (quotient == numerator == 0 && denominator == 1) {
-      // Estimates the fraction from decimal. In general, expect the denr to be
-      // a multiple of 2, 5 or 10.
-      numerator = (int)(decimal * std::pow(10, precision));
-      denominator = std::pow(10, precision);
-      quotient = 0;
-    } else
-      throw invCall("Fraction is not empty");
-    //        ^^ For docs, see sstd::invCall.hpp
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-      return;
-    };
-    return;
-  }
+  // ANCHOR Output methods
 
 #if defined(SSTD_PRINTCONT_HPP)
-
-  /// @brief Prints this as a mixed number.
+  /// @brief Prints fraction as a mixed number. If it cannot be converted into a
+  /// mixed number, i.e. numerator + denominator * quotient < denominator, calls
+  /// sstd::fraction:::print() instead.
   void printMixed() {
-    if (0 == quotient) {  // A fraction will have 0 in the quotient slot.
-      quotient = floor(numerator / denominator);
-      numerator -= denominator * quotient;
+    if (quot == 0) {
+      quot = floor(numr / denr);
+      numr -= denr * quot;
+
+      // Checks if it is still a fraction.
+      if (quot == 0) {
+        this->print();
+        return;
+      }
     }
 
-    // Prints whole number if denominator is 1. If denominator == 1, numerator
-    // should be 0, so just pryinting quotient is enough.
-    if (denominator == 1)
-      std::cout << quotient << "\n";
+    if (numr == 0)
+      std::cout << quot << "\n";
+    else if (denr == 1)
+      std::cout << quot + numr << "\n";
     else
-      std::cout << quotient << ", " << numerator << " / " << denominator
-                << "\n";
+      std::cout << quot << ", " << numr << " / " << denr << "\n";
+
     return;
   }
 
-  /// @brief Prints this as an improper fraction.
-  void printFraction() {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
+  /// @brief Prints fraction as an improrper fraction.
+  void print() {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
     }
 
-    // See fraction::printMixed(). The numerator replaces the quotient.
-    if (denominator == 1)
-      std::cout << numerator << "\n";
+    if (denr == 1)
+      std::cout << numr << "\n";
     else
-      std::cout << numerator << " / " << denominator << "\n";
+      std::cout << numr << " / " << denr << "\n";
+
     return;
   }
 #endif
 
-  /// @brief Converts this to an improper fraction.
-  void toFraction() {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 == quotient) return;
-    numerator += quotient * denominator;
-    quotient = 0;
-    return;
+  // ANCHOR Conversion methods
+
+  /// @brief Converts a mixed number to a fraction.
+  /// @return This as a fraction.
+  fraction<T> tofr() {
+    if (quot == 0) return *this;
+    numr += quot * denr;
+    quot = 0;
+    return *this;
   }
 
-  /// @brief Converts this to a mixed number.
-  /// @note Avoid when possible. Forces a conversion before calculations,
-  /// decreasing efficiency.
-  void toMixed() {
-    if (0 != quotient) return;  // A fraction will have 0 in the quotient slot.
-    quotient = floor(numerator / denominator);
-    numerator -= denominator * quotient;
-    return;
+  /// @brief Converts a fraction to a mixed number.
+  /// @return This as a mixed number.
+  fraction<T> toMixed() {
+    if (quot != 0) return *this;
+    quot = floor(numr / denr);
+    numr -= denr * quot;
+    return *this;
   }
 
-  /// @brief Converts this to decimal.
-  /// @return Returns this as a decimal.
-  long double toDec() { return quotient + (numerator / denominator); }
-
-  /// @brief Simplifies this fraction.
-  /// @warning Fraction is implicitly converted to improper fraction.
-  /// @note Dependencies:
-  /// @note mathutils.hpp -> sstd::highest();
-  void simplify() {
-    long long highest = boost::integer::gcd(numerator, denominator);
-    numerator = numerator / highest;
-    denominator = denominator / highest;
-    return;
+  /// @brief Converts a fraction to a decimal.
+  /// @tparam floatType Any floating point type.
+  /// @return This as a decimal.
+  template <typename floatType, enIf<std::is_floating_point<floatType>>>
+  floatType dec() {
+    return quot + numr / denr;
   }
 
-  /// @brief Adds a fraction to another fraction. Commutative.
-  /// @param _fraction Fraction to add.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Sum, in simplest terms.
-  fraction* add(fraction _fraction, bool simplify = true) {
-    _fraction.toFraction();  // Short circuits if already fraction.
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b + c / d,
-    // Initialises it as a + b / c to save time if c == d.
-    numerator = _fraction.numerator + numerator;
-    if (_fraction.denominator != denominator) {
-      // a / b + c / d = (ad + bc) / bd
-      numerator = (denominator * _fraction.numerator) +
-                  (_fraction.denominator * numerator);
-      denominator = _fraction.denominator * denominator;
-    }
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
+  /// @brief Simplifies a fraction.
+  /// @return This in simplest form.
+  fraction<T> simplify() {
+    T highest = boost::integer::gcd(numr, denr);
+    numr /= highest;
+    denr /= highest;
+    return *this;
   }
 
-  /// @brief Adds an integer to a fraction. Commutative.
-  /// @param toAdd Integer to be added.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Sum, in simplest terms.
-  fraction* add(long long toAdd, bool simplify = true) {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b + c,
-    // a / b + c = (a + bc) / b
-    numerator = numerator + toAdd * denominator;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Subtracts a fraction from another. Not commutative.
-  /// @param _fraction Fraction to be subtracted.
-  /// @return Difference, in simplest terms.
-  /// @note If you want to subtract this fraction from another, call this method
-  /// from the other.
-  fraction* sub(fraction _fraction, bool simplify = true) {
-    _fraction.toFraction();  // Short circuits if already fraction.
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b - c / d,
-    // Initialises it as a - b / c to save time if c == d.
-    numerator = numerator - _fraction.numerator;
-    if (denominator != _fraction.denominator) {
-      // a / b - c / d = (ad - bc) / bd
-      numerator = (_fraction.denominator * numerator) -
-                  (denominator * _fraction.numerator);
-      denominator = denominator * _fraction.denominator;
-    }
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Subtracts an integer from a fraction. Not commutative.
-  /// @param toSub Integer to subtract.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Difference, in simplest terms.
-  fraction* sub(long long toSub, bool simplify = true) {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b - c,
-    // a / b - c = (a - bc) / b
-    numerator = numerator - toSub * denominator;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Subtracts a fraction from an integer. Not commutative.
-  /// @param toSub Integer to subtract from.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Difference, in simplest terms.
-  fraction* subFr(long long toSub, bool simplify = true) {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given c - a / b,
-    // c - a / b = (bc - a) / b
-    numerator = toSub * denominator - numerator;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Multiplies a fraction by another fraction. Commutative.
-  /// @param _fraction Fraction to multiply by.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Product, in simplest terms.
-  fraction* mult(fraction _fraction, bool simplify = true) {
-    _fraction.toFraction();  // Short circuits if already fraction.
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b * c / d,
-    // a / b * c / d = ac / bd
-    numerator = _fraction.numerator * numerator;
-    denominator = _fraction.denominator * denominator;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Multiplies a fraction by an integer. Commutative.
-  /// @param toMult Integer to multiply by.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Product, in simplest terms.
-  fraction* mult(long long toMult, bool simplify = true) {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b * c,
-    // a / b * c = ac / b
-    numerator = numerator * toMult;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Divides a fraction by another fraction. Not commutative.
-  /// @param _fraction Fraction to divide by.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Division, in simplest terms.
-  fraction* div(fraction _fraction, bool simplify = true) {
-    _fraction.toFraction();  // Short circuits if already fraction.
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b / (c / d),
-    // a / b / (c / d) = ad / bc
-    numerator = numerator * _fraction.denominator;
-    denominator = _fraction.denominator * numerator;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Divides a fraction by an integer. Not commutatitve.
-  /// @param toDiv Integer to divide by.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Division, in simplest terms.
-  fraction* div(long long toDiv, bool simplify = true) {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given a / b / c,
-    // a / b / c = a / bc
-    denominator = denominator * toDiv;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /// @brief Divides an integer by a fraction. Not commutative.
-  /// @param toDiv Integer to be divided.
-  /// @param simplify Whether to simplify. Default = true.
-  /// @return Division, in simplest terms.
-  fraction* divBy(long long toDiv, bool simplify = true) {
-    // A mixed number must have a value in quotient. A mixed number with 0 in
-    // the quotient slot might as well be an improper fraction.
-    if (0 != quotient) {
-      numerator += quotient * denominator;
-      quotient = 0;
-    }
-
-    // Given c / (a / b),
-    // c / (a / b) = bc / a
-    numerator = toDiv * denominator;
-    denominator = numerator;
-    if (simplify) {
-      long long highest = boost::integer::gcd(numerator, denominator);
-      numerator = numerator / highest;
-      denominator = denominator / highest;
-    }
-    return this;
-  }
-
-  /*---------------------------- Getter methods ----------------------------*/
+  // ANCHOR Getter methods
 
   /// @brief Gets numerator.
-  /// @return Numerator.
-  long long getNum() { return numerator; }
+  T numerator() { return numr; }
 
   /// @brief Gets denominator.
-  /// @return Denominator.
-  long long getDen() { return denominator; }
+  T denominator() { return denr; }
 
-  /// @brief Gets Quotient.
-  /// @return Quotient.
-  long long getQuo() { return quotient; }
+  /// @brief Gets quotient
+  T quotient() { return quot; }
+
+  // ANCHOR Arithmetic methods
+
+  /// @brief Adds a fraction to this.
+  /// @param _fraction Fraction to be added.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after addition.
+  fraction<T> add(fraction<T> _fraction,
+                  bool simplify = sstd_fraction_simplify) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    if (denr == _fraction.denominator())
+      numr += _fraction.numerator();
+    else {
+      numr = _fraction.numerator() * denr + _fraction.denominator() * numr;
+      denr *= _fraction.denominator();
+    }
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Adds a number to this.
+  /// @param toAdd Number to add.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after addition.
+  fraction<T> add(T toAdd, bool simplify = sstd_fraction_simplify) {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr += toAdd * denr;
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Subtracts a fraction from this.
+  /// @param _fraction Fraction to be subtracted.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after subtraction.
+  fraction<T> sub(fraction<T> _fraction,
+                  bool simplify = sstd_fraction_simplify) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    if (denr == _fraction.denominator())
+      numr -= _fraction.numerator();
+    else {
+      numr = numr * _fraction.denominator() - _fraction.numerator() * denr;
+      denr *= _fraction.denominator();
+    }
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Subtracts a number from this.
+  /// @param toSub Number to be subtracted.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after subtraction.
+  fraction<T> sub(T toSub, bool simplify = sstd_fraction_simplify) {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr -= toSub * denr;
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Multiplies a fraction to this.
+  /// @param _fraction Fraction to be multiplied.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction();
+  /// @return This after multiplication.
+  fraction<T> mult(fraction<T> _fraction,
+                   bool simplify = sstd_fraction_simplify) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr = _fraction.numerator() * numr;
+    denr = _fraction.denominator() * denr;
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Multiplies a number to this.
+  /// @param toMult Number to be multiplied.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after multiplication.
+  fraction<T> mult(T toMult, bool simplify = sstd_fraction_simplify) {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr = numr * toMult;
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Divides this by a fraction.
+  /// @param _fraction Fraction to be divided.
+  /// @param simplify Whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after division.
+  fraction<T> div(fraction<T> _fraction,
+                  bool simplify = sstd_fraction_simplify) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr *= _fraction.denominator();
+    denr *= _fraction.numerator();
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  /// @brief Divides this by a number.
+  /// @param toDiv Fraction to be divided.
+  /// @param simplify whether to be simplified. Default set by
+  /// sstd::configurefraction().
+  /// @return This after division.
+  fraction<T> div(T toDiv, bool simplify = sstd_fraction_simplify) {
+    if (quot != 0) {
+      numr += quot * numr;
+      quot = 0;
+    }
+
+    denr *= toDiv;
+
+    if (simplify) {
+      T highest = boost::integer::gcd(numr, denr);
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
 };
 
-/// @brief Adds a fraction to an integer. Commutative.
-/// @param toAdd Integer to be added to.
-/// @param _base_frac Fraction to be added.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Sum, in simplest terms.
-fraction add(fraction _base_frac, long long toAdd, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(_base_frac.getNum() + toAdd * _base_frac.getDen(),
-                     _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+// ANCHOR Output functions
+
+#if defined(SSTD_PRINTCONT_HPP)
+
+/// @brief Prints a fraction.
+/// @param toPrint Fraction to print.
+/// @param form Form to print fraction. Fraction='f', mixed number='m'.
+/// Default='f'.
+template <typename T>
+void printf(fraction<T> toPrint, char form = 'f') {
+  if (form == 'f') {
+    T numr = toPrint.numerator();
+    if (toPrint.quotient() != 0) {
+      numr += toPrint.quotient() * toPrint.denominator();
+    }
+
+    if (toPrint.denominator() == 1)
+      std::cout << numr << "\n";
+    else
+      std::cout << numr << " / " << toPrint.denominator() << "\n";
+  } else if (form == 'M') {
+    T quot = 0;
+    T numr = toPrint.numerator();
+    if (toPrint.quotient() == 0) {
+      quot = floor(toPrint.numerator() / toPrint.denominator());
+      numr -= toPrint.denominator() * toPrint.quotient();
+    }
+
+    if (toPrint.numerator() == 0)
+      std::cout << quot << "\n";
+    else if (toPrint.denominator() == 1)
+      std::cout << quot + numr << "\n";
+    else
+      std::cout << quot << ", " << numr << " / " << toPrint.denominator()
+                << "\n";
+  } else
+    throw std::invalid_argument("Invalid form. Valid forms are: 'f', 'm'");
+
+  return;
 }
 
-/// @brief Adds an integer to a fraction. Commutative.
-/// @param _base_frac Fraction to be added to.
-/// @param toAdd Integer to be added.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Sum, in simplest terms.
-fraction add(long long toAdd, fraction _base_frac, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(_base_frac.getNum() + toAdd * _base_frac.getDen(),
-                     _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+#endif
+
+template <typename T = long>
+fraction<T> add(fraction<T> _base_frac, T toAdd,
+                bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+
+  return simplify
+             ? fraction<T>(
+                   _base_frac.numerator() + toAdd * _base_frac.denominator(),
+                   _base_frac.denominator())
+                   .simplify()
+             : fraction<T>(
+                   _base_frac.numerator() + toAdd * _base_frac.denominator(),
+                   _base_frac.denominator());
 }
 
-/// @brief Adds a fraction to another fraction. Commutative.
-/// @param _base_frac Fraction to be added to.
-/// @param _fraction Fraction to be added.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Sum, in simplest terms.
-fraction add(fraction _base_frac, fraction _fraction, bool simplify = true) {
-  _base_frac.toFraction();
-  _fraction.toFraction();
-  long long numerator = _base_frac.getNum() + _fraction.getNum();
-  long long denominator = _base_frac.getDen();
-  if (_base_frac.getDen() != _fraction.getDen()) {
-    numerator = (_fraction.getDen() * _base_frac.getNum()) +
-                (_base_frac.getDen() * _fraction.getNum());
-    denominator = _base_frac.getDen() * _fraction.getDen();
+template <typename T = long>
+fraction<T> add(T base_int, fraction<T> _fraction,
+                bool simplify = sstd_fraction_simplify) {
+  _fraction.tofr();
+
+  return simplify
+             ? fraction<T>(
+                   _fraction.numerator() + base_int * _fraction.denominator(),
+                   _fraction.denominator())
+                   .simplify()
+             : fraction<T>(
+                   _fraction.numerator() + base_int * _fraction.denominator(),
+                   _fraction.denominator());
+}
+
+template <typename T = long>
+
+fraction<T> add(fraction<T> _base_frac, fraction<T> _fraction,
+                bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+  _fraction.tofr();
+
+  T numr = _base_frac.numerator() + _fraction.numerator;
+  T denr = _base_frac.denominator();
+
+  if (_base_frac.denominator() != _fraction.denominator()) {
+    numr = _fraction.denominator() * _base_frac.numerator() +
+           _base_frac.denominator() * _fraction.numerator();
+    denr = _base_frac.denominator() * _fraction.denominator();
   }
-  fraction _res_frac(numerator, denominator);
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+
+  return simplify ? fraction<T>(numr, denr).simplify()
+                  : fraction<T>(numr, denr);
 }
 
-/// @brief Subtracts a fraction from another. Not commutative.
-/// @param _base_frac Fraction to be subtracted from.
-/// @param _fraction Fraction to be subtracted.
-/// @return Difference, in simplest terms.
-/// @note If you want to subtract this fraction from another, call this method
-/// from the other.
-fraction sub(fraction _base_frac, fraction _fraction, bool simplify = true) {
-  _base_frac.toFraction();
-  _fraction.toFraction();
-  long long numerator = _base_frac.getNum() - _fraction.getNum();
-  long long denominator = _base_frac.getDen();
-  if (_base_frac.getDen() != _fraction.getDen()) {
-    numerator = (_fraction.getDen() * _base_frac.getNum()) -
-                (_base_frac.getDen() * _fraction.getNum());
-    denominator = _base_frac.getDen() * _fraction.getDen();
+template <typename T = long>
+fraction<T> sub(fraction<T> _base_frac, fraction<T> _fraction,
+                bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+  _fraction.tofr();
+
+  T numr = _base_frac.numerator() - _fraction.denominator();
+  T denr = _base_frac.denominator();
+
+  if (_base_frac.denominator() != _fraction.denominator()) {
+    numr = _fraction.denominator() * _base_frac.numerator() -
+           _fraction.numerator() * _base_frac.denominator();
+    denr = _fraction.numerator() * _fraction.denominator();
   }
-  fraction _res_frac(numerator, denominator);
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+
+  return simplify ? fraction<T>(numr, denr).simplify()
+                  : fraction<T>(numr, denr);
 }
 
-/// @brief Subtracts an integer from a fraction. Not commutative.
-/// @param _base_frac Fraction to be subtracted from.
-/// @param toSub Integer to be subtracted.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Difference, in simplest terms.
-fraction sub(fraction _base_frac, long long toSub, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(_base_frac.getNum() - toSub * _base_frac.getDen(),
-                     _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> sub(fraction<T> _base_frac, T toSub,
+                bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+
+  return simplify
+             ? fraction<T>(
+                   _base_frac.numerator() - toSub * _base_frac.denominator(),
+                   _base_frac.denominator())
+                   .simplify()
+             : fraction<T>(
+                   _base_frac.numerator() - toSub * _base_frac.denominator(),
+                   _base_frac.denominator());
 }
 
-/// @brief Multiplies a fraction by another fraction. Commutative.
-/// @param _base_frac Fraction to be multiplied.
-/// @param _fraction Fraction to multiply by.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Product, in simplest terms.
-fraction mult(fraction _base_frac, fraction _fraction, bool simplify = true) {
-  _base_frac.toFraction();
-  _fraction.toFraction();
-  fraction _res_frac(_fraction.getNum() * _base_frac.getNum(),
-                     _fraction.getDen() * _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> sub(T base_num, fraction<T> _fraction,
+                bool simplify = sstd_fraction_simplify) {
+  _fraction.tofr;
+
+  return simplify
+             ? fraction<T>(
+                   base_num * _fraction.denominator() - _fraction.numerator(),
+                   _fraction.denominator())
+                   .simplify()
+             : fraction<T>(
+                   base_num * _fraction.denominator() - _fraction.numerator(),
+                   _fraction.denominator());
 }
 
-/// @brief Multiplies a fraction by an integer. Commutative.
-/// @param _base_frac Fraction to be multiplied.
-/// @param toMult Integer to multiply by.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Product, in simplest terms.
-fraction mult(fraction _base_frac, long long toMult, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(_base_frac.getNum() * toMult, _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> mult(fraction<T> _base_frac, fraction<T> _fraction,
+                 bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+  _fraction.tofr();
+
+  return simplify
+             ? fraction<T>(_base_frac.numerator() * _fraction.numerator(),
+                           _base_frac.denominator() * _fraction.denominator())
+                   .simplify()
+             : fraction<T>(_base_frac.numerator() * _fraction.numerator(),
+                           _base_frac.denominator() * _fraction.denominator());
 }
 
-/// @brief Multiplies a fraction by an integer. Commutative.
-/// @param toMult Integer to multiply by.
-/// @param _base_frac Fraction to be multiplied.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Product, in simplest terms.
-fraction mult(long long toMult, fraction _base_frac, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(_base_frac.getNum() * toMult, _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> mult(fraction<T> _base_frac, T toMult,
+                 bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+
+  return simplify ? fraction<T>(_base_frac.numerator() * toMult,
+                                _base_frac.denominator())
+                        .simplify()
+                  : fraction<T>(_base_frac.numerator() * toMult,
+                                _base_frac.denominator());
 }
 
-/// @brief Divides a fraction by another fraction. Not commutative.
-/// @param _base_frac Fraction to be divided.
-/// @param _fraction Fraction to divide by.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Division, in simplest terms.
-fraction div(fraction _base_frac, fraction _fraction, bool simplify = true) {
-  _base_frac.toFraction();
-  _fraction.toFraction();
-  fraction _res_frac(_base_frac.getNum() * _fraction.getDen(),
-                     _fraction.getNum() * _base_frac.getDen());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> mult(T base_num, fraction<T> _fraction,
+                 bool simplify = sstd_fraction_simplify) {
+  _fraction.tofr();
+
+  return simplify ? fraction<T>(_fraction.numerator() * base_num,
+                                _fraction.denominator())
+                        .simplify()
+                  : fraction<T>(_fraction.numerator() * base_num,
+                                _fraction.denominator());
 }
 
-/// @brief Divides a fraction by an integer. Not commutatitve.
-/// @param _base_frac Fraction to be divided.
-/// @param toDiv Integer to divide by.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Division, in simplest terms.
-fraction div(fraction _base_frac, long long toDiv, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(_base_frac.getNum(), _base_frac.getDen() * toDiv);
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> div(fraction<T> _base_frac, fraction<T> _fraction,
+                bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+  _fraction.tofr();
+
+  return simplify
+             ? fraction<T>(_base_frac.numerator() * _fraction.denominator(),
+                           _base_frac.denominator() * _fraction.numerator())
+                   .simplify()
+             : fraction<T>(_base_frac.numerator() * _fraction.denominator(),
+                           _base_frac.denominator() * _fraction.numerator());
 }
 
-/// @brief Divides an integer by a fraction. Not commutative.
-/// @param toDiv Integer to be divided.
-/// @param _base_frac Integer to divide by.
-/// @param simplify Whether to simplify. Default = true.
-/// @return Division, in simplest terms.
-fraction div(long long toDiv, fraction _base_frac, bool simplify = true) {
-  _base_frac.toFraction();
-  fraction _res_frac(toDiv * _base_frac.getDen(), _base_frac.getNum());
-  if (simplify) _res_frac.simplify();
-  return _res_frac;
+template <typename T = long>
+fraction<T> div(fraction<T> _base_frac, T toDiv,
+                bool simplify = sstd_fraction_simplify) {
+  _base_frac.tofr();
+
+  return simplify ? fraction<T>(_base_frac.numerator(),
+                                _base_frac.denominator() * toDiv)
+                        .simplify()
+                  : fraction<T>(_base_frac.numerator(),
+                                _base_frac.denominator() * toDiv);
+}
+
+template <typename T = long>
+fraction<T> div(T base_num, fraction<T> _fraction,
+                bool simplify = sstd_fraction_simplify) {
+  _fraction.tofr();
+
+  return simplify ? fraction<T>(base_num * _fraction.denominator(),
+                                _fraction.numerator())
+                        .simplify()
+                  : fraction<T>(base_num * _fraction.denominator(),
+                                _fraction.numerator());
 }
 
 }  // namespace sstd

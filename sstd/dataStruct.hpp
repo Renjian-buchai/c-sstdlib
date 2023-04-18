@@ -2,7 +2,7 @@
  * This file is a part of the SubStandard C++ library.
  *
  * Developed for my own convenience in the future.
- * This product includes software developed by myself.
+ * This product includes software developed by myself.h
  * (Insert website here if I ever decide to make it)
  * See the COPYRIGHT file at the top-level directory of this distribution
  * for details of code security.

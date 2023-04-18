@@ -27,8 +27,8 @@
 #if !defined(SSTD_HPP)
 #define SSTD_HPP
 
+#include <sstd/.io.hpp>
 #include <sstd/dataStruct.hpp>
-#include <sstd/io.hpp>
 #include <sstd/math.hpp>
 
 #endif /* SSTD_HPP */
