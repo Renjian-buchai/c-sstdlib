@@ -27,6 +27,8 @@
 #if !defined(SSTD_CONVERSION_HPP)
 #define SSTD_CONVERSION_HPP
 
+#include <array>
+#include <cmath>
 #include <type_traits>
 
 #if !defined(_PI_)
@@ -98,6 +100,36 @@ template <typename floatType, enIf<std::is_floating_point<floatType>>>
 floatType gTD(floatType gradian) {
   return gradian * 0.9;
 }
+
+namespace complex {
+
+/// @brief Converts complex numbers from a + ib form to r(cosα + isinα).
+/// @tparam T Any arithmetic type.
+/// @param real Real coefficient of complex number.
+/// @param imaginary Imaginary coefficient of complex number.
+/// @throw Domain error when imaginary & real are both 0.
+/// @return Polar representation to complex number in 2-size std::array.
+/// std::array[0] is the r value, and std::array[1] is the α value.
+template <typename T>
+std::array<T, 2> polRep(T real, T imaginary) {
+  return std::array<T, 2>{
+      std::sqrt(std::fabs(real * real + imaginary * imaginary)),
+      std::atan2(imaginary, real)};
+}
+
+/// @brief Converts complex rumbers from r(cosα + isinα) form to a + bi.
+/// @tparam T Any arithmetic type.
+/// @param r r-value of complex number.
+/// @param alpha Alpha-value of complex number.
+/// @return Complex representation of complex number in 2-size std::array.
+/// std::array[0] is the real coefficient, and std::array[1] is the imaginary
+/// coefficient.
+template <typename T>
+std::array<T, 2> compRep(T r, T alpha) {
+  return std::array<T, 2>{r * std::cos(alpha), r * std::sin(alpha)};
+}
+
+}  // namespace complex
 
 }  // namespace sstd
 

@@ -2,27 +2,36 @@
 
 <a name="readme-top"></a>
 
-# About the project
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+
+## About the project
 
 A substandard library for C++, containing some random functions for convenience
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-# Built with
+## Built with
 
-- C++ 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-# Dependencies 
-
-- Boost 
-  Install from https://www.boost.org
-  Add -Ipath/to/boost
+- C++
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## How to use
+## Dependencies
+
+- Boost
+  Install from the [boost website](www.boost.org)
+  Add
+  '''
+  -Ipath/to/boost
+  '''
+  to your compiler arguments or include settings.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Installation
 
 1. Download distributable from `Releases` section
 2. Unzip it.
@@ -33,8 +42,38 @@ If you are using an IDE (e.g. code::blocks), go to compiler settings -> addition
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+Don't forget to give the project a star! Thanks again!
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## License
+
+Distributed under the Creative Commons Attribution-NonCommercial-ShareAlike License. See `LICENSE.txt` for more information.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## Minimum C++ version
 
 I don't know, probably around 2020 to be safe.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
+[contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
+[forks-url]: https://github.com/github_username/repo_name/network/members
+[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
+[stars-url]: https://github.com/github_username/repo_name/stargazers
+[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
+[issues-url]: https://github.com/github_username/repo_name/issues

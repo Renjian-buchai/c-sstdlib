@@ -44,18 +44,9 @@
 #define SSTD_FRACTION_HPP
 
 #include <boost/integer/common_factor.hpp>  // boost::integer::gcd
-#include <cctype>
-#include <cmath>
 #include <exception>
 #include <iostream>
-#include <memory>
-#include <sstd/except/div0.hpp>     // sstd::div0
-#include <sstd/except/invCall.hpp>  // sstd::invCall
-#include <string>
-#include <system_error>
-
-template <typename Condition, typename T = void>
-using enIf = typename std::enable_if<Condition::value, T>::type;
+#include <sstd/except/div0.hpp>  // sstd::div0
 
 namespace sstd {
 
@@ -71,6 +62,9 @@ void configureFraction(bool simplify) { sstd_fraction_simplify = simplify; }
 /// less precise.
 template <class T = long>
 class fraction {
+  template <typename Condition, typename temp = void>
+  using enIf = typename std::enable_if<Condition::value, temp>::type;
+
  private:
   T numr = 0;
   T denr = 1;
@@ -196,6 +190,130 @@ class fraction {
 
   /// @brief Gets quotient
   T quotient() { return quot; }
+
+  // ANCHOR Arithmetic operators
+
+  fraction<T> operator+(fraction<T> _fraction) {
+    _fraction.tofr();
+    T numerator = quot * denr + numr;
+    T denominator = denr;
+
+    if (denominator == _fraction.denominator()) {
+      numerator += _fraction.numerator();
+    } else {
+      numerator = _fraction.numerator() * denominator +
+                  _fraction.denominator() * numerator;
+      denominator *= _fraction.denominator();
+    }
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denominator);
+      numerator /= highest;
+      denominator /= highest;
+    }
+
+    return fraction<T>(numerator, denominator);
+  }
+
+  template <typename arithmetic>
+  fraction<T> operator+(arithmetic toAdd) {
+    T numerator = quot * denr + numr + toAdd * denr;
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denr);
+      numerator /= highest;
+      return fraction<T>(numerator, denr / highest);
+    }
+
+    return fraction<T>(numerator, denr);
+  }
+
+  fraction<T> operator-(fraction<T> _fraction) {
+    T numerator = quot * denr + numr;
+    T denominator = denr;
+
+    if (denominator == _fraction.denominator()) {
+      numerator -= _fraction.numerator();
+    } else {
+      numerator = numerator * _fraction.denominator() -
+                  denominator * _fraction.numerator();
+      denominator *= _fraction.denominator();
+    }
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denominator);
+      numerator /= highest;
+      denominator /= highest;
+    }
+
+    return fraction<T>(numerator, denominator);
+  }
+
+  template <typename arithmetic>
+  fraction<T> operator-(arithmetic toSub) {
+    T numerator = quot * denr + numr - toSub * denominator;
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denr);
+      numerator /= highest;
+      return fraction<T>(numerator, denr / highest);
+    }
+
+    return fraction<T>(numerator, denr);
+  }
+
+  template <typename arithmetic>
+  fraction<T> operator*(arithmetic toMult) {
+    T numerator = (quot * denr + numr) * toMult;
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denr);
+      numerator /= highest;
+      return fraction<T>(numerator, denr / highest);
+    }
+
+    return fraction<T>(numerator, denr);
+  }
+
+  fraction<T> operator*(fraction<T> _fraction) {
+    T numerator = (quot * denr + numr) * _fraction.numerator();
+    T denominator = denr * _fraction.denominator();
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denominator);
+      numerator /= highest;
+      denominator /= highest;
+    }
+
+    return fraction<T>(numerator, denominator);
+  }
+
+  template <typename arithmetic>
+  fraction<T> operator/(arithmetic toDiv) {
+    T numerator = quot * denr + numr;
+    T denominator = denr * toDiv;
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denominator);
+      numerator /= highest;
+      denominator /= highest;
+    }
+
+    return fraction<T>(numerator, denr);
+  }
+
+  fraction<T> operator/(fraction<T> _fraction) {
+    T numerator = (quot * denr + numr) * _fraction.denominator();
+    T denominator = denr * _fraction.numerator();
+
+    if (sstd_fraction_simplify) {
+      T highest = boost::integer::gcd(numerator, denominator);
+      numerator /= highest;
+      denominator /= highest;
+    }
+
+    return fraction<T>(numerator, denominator);
+  }
 
   // ANCHOR Arithmetic methods
 

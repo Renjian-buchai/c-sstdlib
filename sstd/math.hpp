@@ -32,5 +32,6 @@
 #include <sstd/math/fraction.hpp>
 #include <sstd/math/mathutils.hpp>
 #include <sstd/math/matrix.hpp>
+#include <sstd/math/quadratic.hpp>
 
 #endif /* MATH_HPP */
