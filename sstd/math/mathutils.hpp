@@ -47,11 +47,21 @@ namespace sstd {
 /// @param y unsigned long long.
 /// @return Highest common factor of x and y.
 unsigned long long hcf(unsigned long long x, unsigned long long y) {
-  if (x == y) return x;  // guard clause
-  if (x == 0) return y;
-  if (y == 0) return x;
-  if (x > y) return hcf(x - y, y);
-  return hcf(x, y - x);
+  // Fucking cancerous
+  // Guard clauses
+  if (x == 0)
+    return y;
+  else if (y == 0)
+    return x;
+
+  while (x != y) {
+    if (x > y)
+      x = x - y;
+    else
+      y = y - x;
+  }
+
+  return x;
 }
 
 /// @brief Finds the lowest common multiple of two positive integers.
@@ -59,7 +69,30 @@ unsigned long long hcf(unsigned long long x, unsigned long long y) {
 /// @param y unsigned long long.
 /// @return Lowest common multiple of x and y.
 unsigned long long lcm(unsigned long long x, unsigned long long y) {
-  return (x * y) / hcf(x, y);
+  // Using principle lcm = xy/hcf
+  unsigned long long hcf,
+      xcpy = x,
+      ycpy = y;  // Save time on init hcf because it's assigned not augmented.
+  if (x == 0) {
+    hcf = y;
+    goto lcm00;
+  } else if (y == 0) {
+    hcf = x;
+    goto lcm00;
+  }
+
+  while (xcpy != ycpy) {
+    if (xcpy > ycpy)
+      xcpy = xcpy - ycpy;
+    else
+      ycpy = ycpy - xcpy;
+  }
+  hcf = xcpy;
+
+// Technically can use do-while, break, but goto would be faster since no
+// conditions need to be evaluated.
+lcm00:
+  return (x * y) / hcf;
 }
 
 /// @brief Quake III quick inverse square root. Single precision.

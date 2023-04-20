@@ -43,7 +43,7 @@
 #if !defined(SSTD_FRACTION_HPP)
 #define SSTD_FRACTION_HPP
 
-#include <boost/integer/common_factor.hpp>  // boost::integer::gcd
+#include <cmath>
 #include <exception>
 #include <iostream>
 #include <sstd/except/div0.hpp>  // sstd::div0
@@ -107,7 +107,7 @@ class fraction {
   /// sstd::fraction:::print() instead.
   void printMixed() {
     if (quot == 0) {
-      quot = floor(numr / denr);
+      quot = std::floor(numr / denr);
       numr -= denr * quot;
 
       // Checks if it is still a fraction.
@@ -158,7 +158,7 @@ class fraction {
   /// @return This as a mixed number.
   fraction<T> toMixed() {
     if (quot != 0) return *this;
-    quot = floor(numr / denr);
+    quot = std::floor(numr / denr);
     numr -= denr * quot;
     return *this;
   }
@@ -174,7 +174,44 @@ class fraction {
   /// @brief Simplifies a fraction.
   /// @return This in simplest form.
   fraction<T> simplify() {
-    T highest = boost::integer::gcd(numr, denr);
+    T highest;
+    if (numr == 0) {
+      highest = denr;
+    } else if (denr == 0)
+      throw new div0();
+    else {
+      unsigned long long xcpy = numr, ycpy = denr;
+      while (xcpy != ycpy) {
+        if (xcpy > ycpy)
+          xcpy = xcpy - ycpy;
+        else
+          ycpy = ycpy - xcpy;
+      }
+      highest = xcpy;
+    }
+    numr /= highest;
+    denr /= highest;
+    return *this;
+  }
+
+  /// @brief Alias for sstd::fraction::simplify()
+  /// @return This in simplest form.
+  fraction<T> smp() {
+    T highest;
+    if (numr == 0) {
+      highest = denr;
+    } else if (denr == 0)
+      throw new div0();
+    else {
+      unsigned long long xcpy = numr, ycpy = denr;
+      while (xcpy != ycpy) {
+        if (xcpy > ycpy)
+          xcpy = xcpy - ycpy;
+        else
+          ycpy = ycpy - xcpy;
+      }
+      highest = xcpy;
+    }
     numr /= highest;
     denr /= highest;
     return *this;
@@ -207,7 +244,21 @@ class fraction {
     }
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denominator);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       denominator /= highest;
     }
@@ -220,7 +271,21 @@ class fraction {
     T numerator = quot * denr + numr + toAdd * denr;
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       return fraction<T>(numerator, denr / highest);
     }
@@ -241,7 +306,21 @@ class fraction {
     }
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denominator);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       denominator /= highest;
     }
@@ -254,7 +333,21 @@ class fraction {
     T numerator = quot * denr + numr - toSub * denominator;
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       return fraction<T>(numerator, denr / highest);
     }
@@ -267,7 +360,21 @@ class fraction {
     T numerator = (quot * denr + numr) * toMult;
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       return fraction<T>(numerator, denr / highest);
     }
@@ -280,7 +387,21 @@ class fraction {
     T denominator = denr * _fraction.denominator();
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denominator);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       denominator /= highest;
     }
@@ -294,7 +415,21 @@ class fraction {
     T denominator = denr * toDiv;
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denominator);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       denominator /= highest;
     }
@@ -307,12 +442,312 @@ class fraction {
     T denominator = denr * _fraction.numerator();
 
     if (sstd_fraction_simplify) {
-      T highest = boost::integer::gcd(numerator, denominator);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numerator /= highest;
       denominator /= highest;
     }
 
     return fraction<T>(numerator, denominator);
+  }
+
+  fraction<T> operator+=(fraction<T> _fraction) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    if (denr == _fraction.denominator())
+      numr += _fraction.numerator();
+    else {
+      numr = _fraction.numerator() * denr + _fraction.denominator() * numr;
+      denr *= _fraction.denominator();
+    }
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator+=(T toAdd) {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr += toAdd * denr;
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator-=(fraction<T> _fraction) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    if (denr == _fraction.denominator())
+      numr -= _fraction.numerator();
+    else {
+      numr = numr * _fraction.denominator() - _fraction.numerator() * denr;
+      denr *= _fraction.denominator();
+    }
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator-=(T toSub) {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr -= toSub * denr;
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator*=(fraction<T> _fraction) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr = _fraction.numerator() * numr;
+    denr = _fraction.denominator() * denr;
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator*=(T toMult) {
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr = numr * toMult;
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator/=(fraction<T> _fraction) {
+    _fraction.tofr();
+    if (quot != 0) {
+      numr += quot * denr;
+      quot = 0;
+    }
+
+    numr *= _fraction.denominator();
+    denr *= _fraction.numerator();
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator/=(T toDiv) {
+    if (quot != 0) {
+      numr += quot * numr;
+      quot = 0;
+    }
+
+    denr *= toDiv;
+
+    if (sstd_fraction_simplify) {
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
+      numr /= highest;
+      denr /= highest;
+    }
+
+    return *this;
+  }
+
+  fraction<T> operator++() {
+    if (quot != 0) {
+      numr += quot * denr;
+      denr = 0;
+    }
+
+    numr += denr;
+
+    return *this;
+  }
+
+  fraction<T> operator--() {
+    if (quot != 0) {
+      numr += quot * denr;
+      denr = 0;
+    }
+
+    numr -= denr;
+
+    return *this;
   }
 
   // ANCHOR Arithmetic methods
@@ -338,7 +773,21 @@ class fraction {
     }
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -360,7 +809,21 @@ class fraction {
     numr += toAdd * denr;
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -389,7 +852,21 @@ class fraction {
     }
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -411,7 +888,21 @@ class fraction {
     numr -= toSub * denr;
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -436,7 +927,21 @@ class fraction {
     denr = _fraction.denominator() * denr;
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -458,7 +963,21 @@ class fraction {
     numr = numr * toMult;
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -483,7 +1002,21 @@ class fraction {
     denr *= _fraction.numerator();
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -505,7 +1038,21 @@ class fraction {
     denr *= toDiv;
 
     if (simplify) {
-      T highest = boost::integer::gcd(numr, denr);
+      T highest;
+      if (numr == 0) {
+        highest = denr;
+      } else if (denr == 0)
+        throw new div0();
+      else {
+        unsigned long long xcpy = numr, ycpy = denr;
+        while (xcpy != ycpy) {
+          if (xcpy > ycpy)
+            xcpy = xcpy - ycpy;
+          else
+            ycpy = ycpy - xcpy;
+        }
+        highest = xcpy;
+      }
       numr /= highest;
       denr /= highest;
     }
@@ -538,7 +1085,7 @@ void printf(fraction<T> toPrint, char form = 'f') {
     T quot = 0;
     T numr = toPrint.numerator();
     if (toPrint.quotient() == 0) {
-      quot = floor(toPrint.numerator() / toPrint.denominator());
+      quot = std::floor(toPrint.numerator() / toPrint.denominator());
       numr -= toPrint.denominator() * toPrint.quotient();
     }
 
