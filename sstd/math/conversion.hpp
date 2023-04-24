@@ -36,9 +36,9 @@
   3.1415926535'8979323846'2643383279'5028841971'6939937510'5820974944'5923078164'0628620899'8628034825'3421170679
 #endif
 
-#define RECIPROCALOF180 \
+#define SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS \
   0.5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555
-#define RECIPROCALOF200 0.005
+#define SSTD_RECIPROCALOF200_BECAUSEOF_OPTIMISATION_REASONS 0.005
 #define RECPIROCALOFPI \
   0.3183098861'8379067153'7767526745'0287240689'1929148091'2897495334'6881177935'9526845307'0180227605'5325061719
 
@@ -53,7 +53,7 @@ namespace sstd {
 /// @return Angle in radians.
 template <typename floatType, enIf<std::is_floating_point<floatType>>>
 floatType dTR(floatType degree) {
-  return degree * _PI_ * RECIPROCALOF180;
+  return degree * _PI_ * SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS;
 }
 
 /// @brief Converts degrees to gradians.
@@ -62,7 +62,7 @@ floatType dTR(floatType degree) {
 /// @return Angle in gradians.
 template <typename floatType, enIf<std::is_floating_point<floatType>>>
 floatType dTG(floatType degree) {
-  return degree * 200 * RECIPROCALOF180;
+  return degree * 200 * SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS;
 }
 
 /// @brief Converts radians to degrees.
@@ -89,7 +89,7 @@ floatType rTG(floatType radian) {
 /// @return Angle in radians
 template <typename floatType, enIf<std::is_floating_point<floatType>>>
 floatType gTR(floatType gradian) {
-  return gradian * _PI_ * RECIPROCALOF200;
+  return gradian * _PI_ * SSTD_RECIPROCALOF200_BECAUSEOF_OPTIMISATION_REASONS;
 }
 
 /// @brief Converts radians to gradians.
@@ -133,7 +133,7 @@ std::array<T, 2> compRep(T r, T alpha) {
 
 }  // namespace sstd
 
-#undef R180
-#undef R200
+#undef SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS
+#undef SSTD_RECIPROCALOF200_BECAUSEOF_OPTIMISATION_REASONS
 
 #endif

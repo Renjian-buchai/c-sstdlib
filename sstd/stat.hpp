@@ -24,28 +24,10 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_PRINTCONT_HPP)
-#define SSTD_PRINTCONT_HPP
+#if !defined(SSTD_STATISTICS_HPP)
+#define SSTD_STATISTICS_HPP
 
-#include <algorithm>  // std::reverse
-#include <iostream>   // std::cout
-
-namespace sstd {
-
-/// @brief Prints a container.
-/// @tparam Iter : Iterator
-/// @param begin container::begin()
-/// @param end container.end()
-template <typename Iter>
-void print(const Iter begin, const Iter end) {
-  Iter focus = begin, last = end;
-  --last;
-  std::cout << "{";
-  for (; focus != (last); ++focus) std::cout << *focus << ", ";
-  std::cout << *last << "}";
-  return;
-}
-
-}  // namespace sstd
+#include <sstd/stat/median.hpp>
+#include <sstd/stat/std_deviation.hpp>
 
 #endif

@@ -43,6 +43,7 @@
 #if !defined(SSTD_FRACTION_HPP)
 #define SSTD_FRACTION_HPP
 
+#include <algorithm>
 #include <cmath>
 #include <exception>
 #include <iostream>
@@ -55,7 +56,9 @@ bool sstd_fraction_simplify = true;
 /// @brief Configures fraction data.
 /// @param simplify Whether to simplify fractions.
 /// true = simplify, false = do not simplify. Default=true
-void configureFraction(bool simplify) { sstd_fraction_simplify = simplify; }
+constexpr void configureFraction(const bool simplify) {
+  sstd_fraction_simplify = simplify;
+}
 
 /// @brief Class fraction.
 /// @tparam T : Only makes sense if you put an integer type. Float types make it
@@ -65,7 +68,7 @@ class fraction {
   template <typename Condition, typename temp = void>
   using enIf = typename std::enable_if<Condition::value, temp>::type;
 
- private:
+ protected:
   T numr = 0;
   T denr = 1;
   T quot = 0;
@@ -105,7 +108,7 @@ class fraction {
   /// @brief Prints fraction as a mixed number. If it cannot be converted into a
   /// mixed number, i.e. numerator + denominator * quotient < denominator, calls
   /// sstd::fraction:::print() instead.
-  void printMixed() {
+  void printMixed() const {
     if (quot == 0) {
       quot = std::floor(numr / denr);
       numr -= denr * quot;
@@ -128,7 +131,7 @@ class fraction {
   }
 
   /// @brief Prints fraction as an improrper fraction.
-  void print() {
+  void print() const {
     if (quot != 0) {
       numr += quot * denr;
       quot = 0;
@@ -167,7 +170,7 @@ class fraction {
   /// @tparam floatType Any floating point type.
   /// @return This as a decimal.
   template <typename floatType, enIf<std::is_floating_point<floatType>>>
-  floatType dec() {
+  floatType dec() const {
     return quot + numr / denr;
   }
 
@@ -220,17 +223,17 @@ class fraction {
   // ANCHOR Getter methods
 
   /// @brief Gets numerator.
-  T numerator() { return numr; }
+  T numerator() const { return numr; }
 
   /// @brief Gets denominator.
-  T denominator() { return denr; }
+  T denominator() const { return denr; }
 
   /// @brief Gets quotient
-  T quotient() { return quot; }
+  T quotient() const { return quot; }
 
   // ANCHOR Arithmetic operators
 
-  fraction<T> operator+(fraction<T> _fraction) {
+  fraction<T> operator+(fraction<T> _fraction) const {
     _fraction.tofr();
     T numerator = quot * denr + numr;
     T denominator = denr;
@@ -267,7 +270,7 @@ class fraction {
   }
 
   template <typename arithmetic>
-  fraction<T> operator+(arithmetic toAdd) {
+  fraction<T> operator+(arithmetic toAdd) const {
     T numerator = quot * denr + numr + toAdd * denr;
 
     if (sstd_fraction_simplify) {
@@ -293,7 +296,7 @@ class fraction {
     return fraction<T>(numerator, denr);
   }
 
-  fraction<T> operator-(fraction<T> _fraction) {
+  fraction<T> operator-(fraction<T> _fraction) const {
     T numerator = quot * denr + numr;
     T denominator = denr;
 
@@ -329,7 +332,7 @@ class fraction {
   }
 
   template <typename arithmetic>
-  fraction<T> operator-(arithmetic toSub) {
+  fraction<T> operator-(arithmetic toSub) const {
     T numerator = quot * denr + numr - toSub * denominator;
 
     if (sstd_fraction_simplify) {
@@ -356,7 +359,7 @@ class fraction {
   }
 
   template <typename arithmetic>
-  fraction<T> operator*(arithmetic toMult) {
+  fraction<T> operator*(arithmetic toMult) const {
     T numerator = (quot * denr + numr) * toMult;
 
     if (sstd_fraction_simplify) {
@@ -382,7 +385,7 @@ class fraction {
     return fraction<T>(numerator, denr);
   }
 
-  fraction<T> operator*(fraction<T> _fraction) {
+  fraction<T> operator*(fraction<T> _fraction) const {
     T numerator = (quot * denr + numr) * _fraction.numerator();
     T denominator = denr * _fraction.denominator();
 
@@ -410,7 +413,7 @@ class fraction {
   }
 
   template <typename arithmetic>
-  fraction<T> operator/(arithmetic toDiv) {
+  fraction<T> operator/(arithmetic toDiv) const {
     T numerator = quot * denr + numr;
     T denominator = denr * toDiv;
 
@@ -437,7 +440,7 @@ class fraction {
     return fraction<T>(numerator, denr);
   }
 
-  fraction<T> operator/(fraction<T> _fraction) {
+  fraction<T> operator/(fraction<T> _fraction) const {
     T numerator = (quot * denr + numr) * _fraction.denominator();
     T denominator = denr * _fraction.numerator();
 
@@ -739,7 +742,31 @@ class fraction {
     return *this;
   }
 
+  /// Postincrement
+  fraction<T> operator++(int) {
+    if (quot != 0) {
+      numr += quot * denr;
+      denr = 0;
+    }
+
+    numr += denr;
+
+    return *this;
+  }
+
+  /// Postincrement
   fraction<T> operator--() {
+    if (quot != 0) {
+      numr += quot * denr;
+      denr = 0;
+    }
+
+    numr -= denr;
+
+    return *this;
+  }
+
+  fraction<T> operator--(int) {
     if (quot != 0) {
       numr += quot * denr;
       denr = 0;
@@ -1070,7 +1097,7 @@ class fraction {
 /// @param form Form to print fraction. Fraction='f', mixed number='m'.
 /// Default='f'.
 template <typename T>
-void printf(fraction<T> toPrint, char form = 'f') {
+void print(const fraction<T> toPrint, const char form = 'f') {
   if (form == 'f') {
     T numr = toPrint.numerator();
     if (toPrint.quotient() != 0) {
@@ -1105,8 +1132,8 @@ void printf(fraction<T> toPrint, char form = 'f') {
 #endif
 
 template <typename T = long>
-fraction<T> add(fraction<T> _base_frac, T toAdd,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> add(const fraction<T> _base_frac, const T toAdd,
+                const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
 
   return simplify
@@ -1120,8 +1147,8 @@ fraction<T> add(fraction<T> _base_frac, T toAdd,
 }
 
 template <typename T = long>
-fraction<T> add(T base_int, fraction<T> _fraction,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> add(const T base_int, const fraction<T> _fraction,
+                const bool simplify = sstd_fraction_simplify) {
   _fraction.tofr();
 
   return simplify
@@ -1135,9 +1162,8 @@ fraction<T> add(T base_int, fraction<T> _fraction,
 }
 
 template <typename T = long>
-
-fraction<T> add(fraction<T> _base_frac, fraction<T> _fraction,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> add(const fraction<T> _base_frac, const fraction<T> _fraction,
+                const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
   _fraction.tofr();
 
@@ -1155,8 +1181,8 @@ fraction<T> add(fraction<T> _base_frac, fraction<T> _fraction,
 }
 
 template <typename T = long>
-fraction<T> sub(fraction<T> _base_frac, fraction<T> _fraction,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> sub(const fraction<T> _base_frac, const fraction<T> _fraction,
+                const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
   _fraction.tofr();
 
@@ -1174,8 +1200,8 @@ fraction<T> sub(fraction<T> _base_frac, fraction<T> _fraction,
 }
 
 template <typename T = long>
-fraction<T> sub(fraction<T> _base_frac, T toSub,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> sub(const fraction<T> _base_frac, const T toSub,
+                const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
 
   return simplify
@@ -1189,8 +1215,8 @@ fraction<T> sub(fraction<T> _base_frac, T toSub,
 }
 
 template <typename T = long>
-fraction<T> sub(T base_num, fraction<T> _fraction,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> sub(const T base_num, const fraction<T> _fraction,
+                const bool simplify = sstd_fraction_simplify) {
   _fraction.tofr;
 
   return simplify
@@ -1204,8 +1230,8 @@ fraction<T> sub(T base_num, fraction<T> _fraction,
 }
 
 template <typename T = long>
-fraction<T> mult(fraction<T> _base_frac, fraction<T> _fraction,
-                 bool simplify = sstd_fraction_simplify) {
+fraction<T> mult(const fraction<T> _base_frac, const fraction<T> _fraction,
+                 const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
   _fraction.tofr();
 
@@ -1218,8 +1244,8 @@ fraction<T> mult(fraction<T> _base_frac, fraction<T> _fraction,
 }
 
 template <typename T = long>
-fraction<T> mult(fraction<T> _base_frac, T toMult,
-                 bool simplify = sstd_fraction_simplify) {
+fraction<T> mult(const fraction<T> _base_frac, const T toMult,
+                 const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
 
   return simplify ? fraction<T>(_base_frac.numerator() * toMult,
@@ -1230,8 +1256,8 @@ fraction<T> mult(fraction<T> _base_frac, T toMult,
 }
 
 template <typename T = long>
-fraction<T> mult(T base_num, fraction<T> _fraction,
-                 bool simplify = sstd_fraction_simplify) {
+fraction<T> mult(const T base_num, const fraction<T> _fraction,
+                 const bool simplify = sstd_fraction_simplify) {
   _fraction.tofr();
 
   return simplify ? fraction<T>(_fraction.numerator() * base_num,
@@ -1242,8 +1268,8 @@ fraction<T> mult(T base_num, fraction<T> _fraction,
 }
 
 template <typename T = long>
-fraction<T> div(fraction<T> _base_frac, fraction<T> _fraction,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> div(const fraction<T> _base_frac, const fraction<T> _fraction,
+                const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
   _fraction.tofr();
 
@@ -1256,8 +1282,8 @@ fraction<T> div(fraction<T> _base_frac, fraction<T> _fraction,
 }
 
 template <typename T = long>
-fraction<T> div(fraction<T> _base_frac, T toDiv,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> div(const fraction<T> _base_frac, const T toDiv,
+                const bool simplify = sstd_fraction_simplify) {
   _base_frac.tofr();
 
   return simplify ? fraction<T>(_base_frac.numerator(),
@@ -1268,8 +1294,8 @@ fraction<T> div(fraction<T> _base_frac, T toDiv,
 }
 
 template <typename T = long>
-fraction<T> div(T base_num, fraction<T> _fraction,
-                bool simplify = sstd_fraction_simplify) {
+fraction<T> div(const T base_num, const fraction<T> _fraction,
+                const bool simplify = sstd_fraction_simplify) {
   _fraction.tofr();
 
   return simplify ? fraction<T>(base_num * _fraction.denominator(),

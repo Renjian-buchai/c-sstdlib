@@ -38,239 +38,180 @@
 #define SSTD_MATRIX_HPP
 
 #include <array>
-#include <cstdlib>
+#include <cassert>
 #include <exception>
-#include <iostream>
 #include <sstd/except/invCall.hpp>
-#include <type_traits>
-#include <vector>
-
-// TODO Add reason
-// TODO Compose everything if app
-
-template <typename Condition, typename T = void>
-using enIf = typename std::enable_if<Condition::value, T>::type;
 
 namespace sstd {
 
-/// @brief 2-dimensional matrix class.
-/// @tparam T : Any arithmetic type.
-/// @tparam dX : Number of columns in matrix.
-/// @tparam dY : Number of rows in matrix.
 template <class T, size_t dX, size_t dY>
 class matrix2 {
- private:
-  std::array<std::array<T, dY>, dX> matrix;
+ protected:
+  std::array<std::array<T, dX>, dY> matx;
+  size_t sizeX = dX, sizeY = dY;
 
  public:
-  /// @brief Fills matrix with an array.
-  /// @param valueSet Array to fill matrix with. Size of array must equal the
-  /// number of elements in matrix.
-  matrix2(std::array<T, dX * dY> valueSet) {
-    size_t k = 0;
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[i].size(); ++j, ++k) {
-        matrix[i][j] = valueSet[k];
-      }
-    return;
+  // ANCHOR Constructors & destructors
+  constexpr matrix2() {
+    if (sizeX != sizeY)
+      throw invCall("Identity matrix can only be applied to square matrix.");
+    for (size_t i = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] = (i == j) ? 1 : 0;
   }
-
-  /// @brief Fills matrix with a 2-dimensional array.
-  /// @param valueSet 2-dimensional array to fill matrix with. Size of array
-  /// must equal the size of matrix.
-  matrix2(std::array<std::array<T, dY>, dX> valueSet) {
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[0].size(); ++j) {
-        matrix[i][j] = valueSet[i][j];
-      }
-    return;
+  template <class Iter>
+  matrix2(const Iter begin, const Iter end) {
+    if (end - begin != dX * dY)
+      throw std::invalid_argument(
+          "Number of elements in container must be sizeX * sizeY");
+    for (size_t i = 0, ii = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j, ++ii) matx[i][j] = *(begin + ii);
   }
+  matrix2(std::array<std::array<T, dX>, dY> _matrix) { matx = _matrix; }
 
-  /// @brief Allows user to input elements into a matrix.
-  /// @param x Any integer. Only used to differentiate between
-  /// matrix2::matrix2(int) and matrix2::matrix2()
-  matrix2(int x) {
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[0].size(); ++j) {
-        std::cout << "Element " << i + 1 << ", " << j + 1 << ": ";
-        std::cin >> matrix[i][j];
-      }
-    return;
-  }
+  ~matrix2() {}
 
-  /// @brief Creates an identity matrix. An identity matrix is a matrix that
-  /// is multiplied to another matrix to return the latter matrix itself. i.e.
-  /// matrix * identity matrix = matrix
-  /// @note Dependencies:
-  /// @note sstd/except/invCall.hpp -> invCall
-  matrix2() {
-    if (matrix.size() != matrix[0].size())
-      throw invCall("Identity matrices must be square");
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[1].size(); ++j) matrix[i][j] = 0;
-    for (size_t i = 0; i < matrix.size(); ++i) matrix[i][i] = 1;
-  }
+// ANCHOR I/O
+#ifdef SSTD_PRINTCONT_HPP
 
-#if defined(SSTD_PRINTCONT_HPP)
-  /// @brief Prints matrix. Each element is separated by a space.
-  void printMatrix() {
-    std::cout << std::endl;
-    for (size_t i = 0; i < matrix.size(); ++i) {
-      for (size_t j = 0; j < matrix[0].size(); ++j)
-        std::cout << matrix[i][j] << " ";
+  void print() const {
+    for (size_t i = 0; i < sizeX; ++i) {
+      for (size_t j = 0; j < sizeY; ++j) std::cout << matx[i][j] << " ";
       std::cout << "\n";
     }
-    return;
   }
+
 #endif
 
-  /// @brief Adds a matrix to this matrix.
-  /// @param _matrix Matrix of the same size as this.
-  /// @return This.
-  matrix2* add(matrix2<T, dX, dY> _matrix) {
-    if (matrix.size() != _matrix.getMatrix().size() ||
-        matrix[1].size() != _matrix.getMatrix()[1].size())
-      throw std::invalid_argument("Matrix must be same sized");
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[0].size(); ++j)
-        matrix[i][j] += _matrix.getMatrix()[i][j];
-    return this;
+  // ANCHOR Arithmetic methods
+  template <typename M>
+  matrix2<T, dX, dY> mult(M toMult) {
+    for (size_t i = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] *= toMult;
+    return *this;
   }
 
-  /// @brief Subtracts a matrix from this matrix.
-  /// @param _matrix Matrix of the same size as this.
-  /// @return This.
-  /// @note If you want to subtract this matrix from another, do it from the
-  /// other matrix.
-  matrix2* sub(matrix2<T, dX, dY> _matrix) {
-    if (matrix.size() != _matrix.getMatrix().size() ||
-        matrix[1].size() != _matrix.getMatrix()[1].size())
-      throw std::invalid_argument("Matrix must be same sized");
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[0].size(); ++j)
-        matrix[i][j] += _matrix.getMatrix[i][j];
-    return this;
+  matrix2<T, dX, dY> add(matrix2<T, dX, dY> toAdd) {
+    if (toAdd.X() != sizeX)
+      throw std::invalid_argument("Width of matrices must be equal");
+    if (toAdd.Y() != sizeY)
+      throw std::invalid_argument("Height of matrices must be equal");
+    for (size_t i = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] += toAdd.get(i, j);
+    return *this;
   }
 
-  /// @brief Multiplies a matrix by a scalar.
-  /// @tparam arithType : Any arithmetic type.
-  /// @param toMult Scalar to multiply this vector by.
-  /// @return This.
-  template <typename arithType, enIf<std::is_arithmetic<arithType>>>
-  matrix2* mult(arithType toMult) {
-    for (size_t i = 0; i < matrix.size(); ++i)
-      for (size_t j = 0; j < matrix[0].size(); ++j)
-        matrix[i][j] = matrix[i][j] * toMult;
-    return this;
+  matrix2<T, dX, dY> sub(matrix2<T, dX, dY> toAdd) {
+    if (toAdd.X() != sizeX)
+      throw std::invalid_argument("Width of matrices must be equal");
+    if (toAdd.Y() != sizeY)
+      throw std::invalid_argument("Height of matrices must be equal");
+    for (size_t i = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] -= toAdd.get(i, j);
+    return *this;
   }
 
-  /*---------------------------- Getter methods ----------------------------*/
+  matrix2<T, dX, dY> negate() {
+    for (size_t i = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] = -matx[i][j];
+    return *this;
+  }
 
-  /// @brief Gets matrix.
-  /// @return Matrix.
-  matrix2 getMatrix() { return matrix; };
+  matrix2<T, dX, dY> transpose() {
+    if (sizeX != sizeY)
+      throw invCall("Tronsposition can only be applied on square matrices");
+    std::array<std::array<T, dY>, dX> result;
+    for (size_t i = 0; i < sizeX; ++i)
+      for (size_t j = 0; j < sizeY; ++j) result[i][j] = matx[j][i];
+    matx = result;
+    return *this;
+  }
 
-  /// @brief Returns size of matrix in an array in format (x, y).
-  /// @return Array containing size of matrix.
-  std::array<size_t, 2> size() {
-    return std::array<size_t, 2> { matrix.size(), matrix[0].size() }
+  // ANCHOR Getter methods
+  constexpr size_t X() const { return sizeX; }
+  constexpr size_t Y() const { return sizeY; }
+  std::array<std::array<T, dX>, dY> matrix() const { return matx; }
+  T get(size_t _x, size_t _y) const {
+    if (_x > sizeX)
+      throw std::invalid_argument("_x not in range matrix.size()");
+    if (_y > sizeY)
+      throw std::invalid_argument("_y not in range matrix[0].size()");
+    return matx[_x][_y];
+  }
+  matrix2<T, dX, dY> get(size_t _x, size_t _y, T value) {
+    if (_x > sizeX)
+      throw std::invalid_argument("_x not in range matrix.size()");
+    if (_y > sizeY)
+      throw std::invalid_argument("_y not in range matrix[0].size()");
+    matx[_x][_y] = value;
+    return *this;
   }
 };
 
-/// @brief Adds a matrix to another. Commutative.
-/// @tparam T : Any arithmetic type.
-/// @tparam dX : Number of columns in a matrix.
-/// @tparam dY : Number of rows in a matrix.
-/// @param _base_matrix Matrix to be added to.
-/// @param _matrix Matrix to be added.
-/// @return Summed matrix.
+#ifdef SSTD_PRINTCONT_HPP
+
 template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> add(matrix2<T, dX, dY> _base_matrix,
-                       matrix2<T, dX, dY> _matrix) {
-  if (_matrix.getMatrix().size() != _base_matrix.getMatrix().size() ||
-      _matrix.getMatrix()[1].size() != _base_matrix.getMatrix()[1].size())
-    throw std::invalid_argument("Matrix must be same sized");
-  std::array<std::array<T, dX>, dY> _res_matrix;
-  for (size_t i = 0; i < _matrix.getMatrix().size(); ++i)
-    for (size_t j = 0; j < _matrix.getMatrix()[0].size(); ++j)
-      _res_matrix[i][j] =
-          _base_matrix.getMatrix()[i][j] + _matrix.getMatrix()[i][j];
-  return matrix2<T, dX, dY>(_res_matrix);
+void print(const matrix2<T, dX, dY> _matrix) {
+  for (size_t i = 0; i < _matrix.X(); ++i) {
+    for (size_t j = 0; j < _matrix.Y(); ++j)
+      std::cout << _matrix.get(i, j) << " ";
+    std::cout << "\n";
+  }
 }
 
-/// @brief Subtracts a matrix from another. Not commutative.
-/// @tparam T : Any arithmetic type.
-/// @tparam dX : Number of columns in a matrix.
-/// @tparam dY : Number of rows in a matrix.
-/// @param _base_matrix Matrix to bo subtracted from.
-/// @param _matrix Matrix to be subtracted.
-/// @return Difference in matrices.
+#endif
+
 template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> sub(matrix2<T, dX, dY> _base_matrix,
-                       matrix2<T, dX, dY> _matrix) {
-  if (_matrix.getMatrix().size() != _base_matrix.getMatrix().size() ||
-      _matrix.getMatrix()[1].size() != _base_matrix.getMatrix()[1].size())
-    throw std::invalid_argument("Matrix must be same sized");
-  std::array<std::array<T, dX>, dY> _res_matrix;
-  for (size_t i = 0; i < _matrix.getMatrix().size(); ++i)
-    for (size_t j = 0; j < _matrix.getMatrix()[0].size(); ++j)
-      _res_matrix[i][j] =
-          _base_matrix.getMatrix()[i][j] - _matrix.getMatrix()[i][j];
-  return matrix2<T, dX, dY>(_res_matrix);
+matrix2<T, dX, dY> add(const matrix2<T, dX, dY> _matrix,
+                       const matrix2<T, dX, dY> toAdd) {
+  if (toAdd.X() != _matrix.X())
+    throw std::invalid_argument("Width of matrices must be equal");
+  if (toAdd.Y() != _matrix.Y())
+    throw std::invalid_argument("Height of matrices must be equal");
+  matrix2<T, dX, dY> result;
+  for (int i = 0; i < dX; ++i)
+    for (int j = 0; j < dY; ++j)
+      result.get(i, j, _matrix.get(i, j) + toAdd.get(i, j));
+  return result;
 }
 
-/// @brief Multiplies 2 matrices. Not commutative.
-/// @tparam T : Any arithmetic type.
-/// @tparam dX : Number of columns in output matrix.
-/// @tparam N : Number to be chained.
-/// @tparam dY : Number of rows in output matrix.
-/// @param _base_matrix Matrix to be multiplied.
-/// @param _matrix Matrix to multiplied.
-/// @return Product of matrices.
-template <typename T, size_t dX, size_t N, size_t dY>
-matrix2<T, dX, dY> mult(matrix2<T, dX, N> _base_matrix,
-                        matrix2<T, N, dY> _matrix) {
-  if (_base_matrix.getMatrix().size() != _base_matrix.getMatrix()[0].size())
-    throw std::invalid_argument("Matrix must be same sized");
-  std::array<std::array<T, dX>, dY> _res_matrix;
-  for (size_t i = 0; i < _res_matrix.size(); ++i)
-    for (size_t j = 0; j < _res_matrix[0].size(); ++j)
-      for (size_t ii = 0; ii < _matrix.getMatrix()[0].size(); ++ii)
-        _res_matrix[i][j] =
-            _base_matrix.getMatrix[i][ii] * _matrix.getMatrix[ii][j];
-  return matrix2<T, dX, dY>(_res_matrix);
+template <typename T, size_t dX, size_t dY>
+matrix2<T, dX, dY> sub(const matrix2<T, dX, dY> _matrix,
+                       const matrix2<T, dX, dY> toSub) {
+  if (toSub.X() != _matrix.X())
+    throw std::invalid_argument("Width of matrices must be equal");
+  if (toSub.Y() != _matrix.Y())
+    throw std::invalid_argument("Height of matrices must be equal");
+  matrix2<T, dX, dY> result;
+  for (int i = 0; i < dX; ++i)
+    for (int j = 0; j < dY; ++j)
+      result.get(i, j, _matrix.get[i][j] - toSub.get[i][j]);
+  return result;
 }
 
-/// @brief Multiplies a matrix by a scalar. Commutative.
-/// @tparam T : Any arithmetic type.
-/// @tparam dX : Number of columns in matrix.
-/// @tparam dY : Number of rows in matrix.
-/// @param _base_matrix Matrix to be multiplied.
-/// @param toMult scalar to be multiplied.
-/// @return Product of matrices.
 template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> mult(matrix2<T, dX, dY> _base_matrix, T toMult) {
-  std::array<std::array<T, dX>, dY> _res_matrix;
-  for (size_t i = 0; i < _res_matrix.size(); ++i)
-    for (size_t j = 0; j < _res_matrix[0].size(); ++j)
-      _res_matrix[i][j] = _base_matrix.getMatrix()[i][j] * toMult;
-  return matrix2<T, dX, dY>(_res_matrix);
+matrix2<T, dX, dY> mult(const matrix2<T, dX, dY> _matrix, const T toMult) {
+  matrix2<T, dX, dY> result;
+  for (size_t i = 0; i < dX; ++i)
+    for (size_t j = 0; j < dY; ++j)
+      result.get(i, j, _matrix.get(i, j) * toMult);
+  return result;
 }
 
-/// @brief Multiplies a matrix by a scalar. Commutative.
-/// @tparam T : Any arithmetic type.
-/// @tparam dX : Number of columns in matrix.
-/// @tparam dY : Number of rows in matrix.
-/// @param toMult scalar to be multiplied.
-/// @param _base_matrix Matrix to be multiplied.
-/// @return Product of matrices.
-template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> mult(T toMult, matrix2<T, dX, dY> _base_matrix) {
-  std::array<std::array<T, dX>, dY> _res_matrix;
-  for (size_t i = 0; i < _res_matrix.size(); ++i)
-    for (size_t j = 0; j < _res_matrix[0].size(); ++j)
-      _res_matrix[i][j] = _base_matrix.getMatrix()[i][j] * toMult;
-  return matrix2<T, dX, dY>(_res_matrix);
+template <typename T, size_t dX, size_t temp, size_t dY>
+matrix2<T, dX, dY> mult(const matrix2<T, dX, temp> _matrix,
+                        const matrix2<T, temp, dY> toMult) {
+  if (_matrix.Y() != toMult.X())
+    throw std::invalid_argument(
+        "Height of _matrix must equal to width of toMult");
+  matrix2<T, dX, dY> result;
+  for (int i = 0; i < dY; ++i)
+    for (int j = 0; j < dX; ++j) {
+      T sum = 0;
+      for (int ii = 0; ii < temp; ++ii)
+        sum += _matrix.get(i, ii) * toMult.get(ii, j);
+      result.get(i, j, sum);
+    }
+  return result;
 }
 
 }  // namespace sstd

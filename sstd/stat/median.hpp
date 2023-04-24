@@ -24,26 +24,20 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_PRINTCONT_HPP)
-#define SSTD_PRINTCONT_HPP
+#if !defined(SSTD_MEDIAN_HPP)
+#define SSTD_MEDIAN_HPP
 
-#include <algorithm>  // std::reverse
-#include <iostream>   // std::cout
+#include <algorithm>
+#include <iostream>
+#include <type_traits>
+#include <vector>
 
 namespace sstd {
 
-/// @brief Prints a container.
-/// @tparam Iter : Iterator
-/// @param begin container::begin()
-/// @param end container.end()
-template <typename Iter>
-void print(const Iter begin, const Iter end) {
-  Iter focus = begin, last = end;
-  --last;
-  std::cout << "{";
-  for (; focus != (last); ++focus) std::cout << *focus << ", ";
-  std::cout << *last << "}";
-  return;
+template <typename FLOAT, typename Iter>
+FLOAT median(const Iter begin, const Iter end) {
+  std::vector<FLOAT> copy;
+  std::copy(begin, end, copy.begin());
 }
 
 }  // namespace sstd
