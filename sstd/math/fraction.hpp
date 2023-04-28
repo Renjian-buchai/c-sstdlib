@@ -150,7 +150,7 @@ class fraction {
 
   /// @brief Converts a mixed number to a fraction.
   /// @return This as a fraction.
-  fraction<T> tofr() {
+  inline fraction<T> tofr() {
     if (quot == 0) return *this;
     numr += quot * denr;
     quot = 0;
@@ -176,7 +176,7 @@ class fraction {
 
   /// @brief Simplifies a fraction.
   /// @return This in simplest form.
-  fraction<T> simplify() {
+  inline fraction<T> simplify() {
     T highest;
     if (numr == 0) {
       highest = denr;
@@ -199,7 +199,7 @@ class fraction {
 
   /// @brief Alias for sstd::fraction::simplify()
   /// @return This in simplest form.
-  fraction<T> smp() {
+  inline fraction<T> smp() {
     T highest;
     if (numr == 0) {
       highest = denr;
@@ -223,13 +223,13 @@ class fraction {
   // ANCHOR Getter methods
 
   /// @brief Gets numerator.
-  T numerator() const { return numr; }
+  inline T numerator() const { return numr; }
 
   /// @brief Gets denominator.
-  T denominator() const { return denr; }
+  inline T denominator() const { return denr; }
 
   /// @brief Gets quotient
-  T quotient() const { return quot; }
+  inline T quotient() const { return quot; }
 
   // ANCHOR Arithmetic operators
 
@@ -246,57 +246,20 @@ class fraction {
       denominator *= _fraction.denominator();
     }
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      denominator /= highest;
-    }
-
-    return fraction<T>(numerator, denominator);
+    return sstd_fraction_simplify
+               ? fraction<T>(numerator, denominator).simplify()
+               : fraction<T>(numerator, denominator);
   }
 
   template <typename arithmetic>
   fraction<T> operator+(arithmetic toAdd) const {
-    T numerator = quot * denr + numr + toAdd * denr;
-
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      return fraction<T>(numerator, denr / highest);
-    }
-
-    return fraction<T>(numerator, denr);
+    return sstd_fraction_simplify
+               ? fraction<T>(quot * denr + numr + toAdd * denr, denr).simplify()
+               : fraction<T>(quot * denr + numr + toAdd * denr, denr);
   }
 
   fraction<T> operator-(fraction<T> _fraction) const {
+    _fraction.tofr();
     T numerator = quot * denr + numr;
     T denominator = denr;
 
@@ -308,163 +271,52 @@ class fraction {
       denominator *= _fraction.denominator();
     }
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      denominator /= highest;
-    }
-
-    return fraction<T>(numerator, denominator);
+    return sstd_fraction_simplify
+               ? fraction<T>(numerator, denominator).simplify()
+               : fraction<T>(numerator, denominator);
   }
 
   template <typename arithmetic>
   fraction<T> operator-(arithmetic toSub) const {
-    T numerator = quot * denr + numr - toSub * denominator;
-
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      return fraction<T>(numerator, denr / highest);
-    }
-
-    return fraction<T>(numerator, denr);
+    return sstd_fraction_simplify
+               ? fraction<T>(quot * denr + numr - toSub * denr, denr).simplify()
+               : fraction<T>(quot * denr + numr - toSub * denr, denr);
   }
 
   template <typename arithmetic>
   fraction<T> operator*(arithmetic toMult) const {
-    T numerator = (quot * denr + numr) * toMult;
-
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      return fraction<T>(numerator, denr / highest);
-    }
-
-    return fraction<T>(numerator, denr);
+    return sstd_fraction_simplify
+               ? fraction<T>((quot * denr + numr) * toMult, denr).simplify()
+               : fraction<T>((quot * denr + numr) * toMult, denr);
   }
 
   fraction<T> operator*(fraction<T> _fraction) const {
-    T numerator = (quot * denr + numr) * _fraction.numerator();
-    T denominator = denr * _fraction.denominator();
+    _fraction.tofr();
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      denominator /= highest;
-    }
-
-    return fraction<T>(numerator, denominator);
+    return sstd_fraction_simplify
+               ? fraction<T>((quot * denr + numr) * _fraction.numerator(),
+                             denr * _fraction.denominator())
+                     .simplify()
+               : fraction<T>((quot * denr + numr) * _fraction.numerator(),
+                             denr * _fraction.denominator());
   }
 
   template <typename arithmetic>
   fraction<T> operator/(arithmetic toDiv) const {
-    T numerator = quot * denr + numr;
-    T denominator = denr * toDiv;
-
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      denominator /= highest;
-    }
-
-    return fraction<T>(numerator, denr);
+    return sstd_fraction_simplify
+               ? fraction<T>(quot * denr + numr, denr * toDiv).simplify()
+               : fraction<T>(quot * denr + numr, denr * toDiv);
   }
 
   fraction<T> operator/(fraction<T> _fraction) const {
-    T numerator = (quot * denr + numr) * _fraction.denominator();
-    T denominator = denr * _fraction.numerator();
+    _fraction.tofr();
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numerator /= highest;
-      denominator /= highest;
-    }
-
-    return fraction<T>(numerator, denominator);
+    return sstd_fraction_simplify
+               ? fraction<T>((quot * denr + numr) * _fraction.denominator(),
+                             denr * _fraction.numerator())
+                     .simplify()
+               : fraction<T>((quot * denr + numr) * _fraction.denominator(),
+                             denr * _fraction.numerator());
   }
 
   fraction<T> operator+=(fraction<T> _fraction) {
@@ -481,27 +333,7 @@ class fraction {
       denr *= _fraction.denominator();
     }
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator+=(T toAdd) {
@@ -512,27 +344,7 @@ class fraction {
 
     numr += toAdd * denr;
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator-=(fraction<T> _fraction) {
@@ -549,27 +361,7 @@ class fraction {
       denr *= _fraction.denominator();
     }
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator-=(T toSub) {
@@ -580,27 +372,7 @@ class fraction {
 
     numr -= toSub * denr;
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator*=(fraction<T> _fraction) {
@@ -613,27 +385,7 @@ class fraction {
     numr = _fraction.numerator() * numr;
     denr = _fraction.denominator() * denr;
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator*=(T toMult) {
@@ -642,29 +394,9 @@ class fraction {
       quot = 0;
     }
 
-    numr = numr * toMult;
+    numr *= toMult;
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator/=(fraction<T> _fraction) {
@@ -677,27 +409,7 @@ class fraction {
     numr *= _fraction.denominator();
     denr *= _fraction.numerator();
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator/=(T toDiv) {
@@ -708,27 +420,7 @@ class fraction {
 
     denr *= toDiv;
 
-    if (sstd_fraction_simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return sstd_fraction_simplify ? *this.simplify() : *this;
   }
 
   fraction<T> operator++() {
@@ -739,7 +431,7 @@ class fraction {
 
     numr += denr;
 
-    return *this;
+    return sstd_fraction_simplify ? *this->simplify() : *this;
   }
 
   /// Postincrement
@@ -751,7 +443,7 @@ class fraction {
 
     numr += denr;
 
-    return *this;
+    return sstd_fraction_simplify ? *this->simplify() : *this;
   }
 
   /// Postincrement
@@ -763,7 +455,7 @@ class fraction {
 
     numr -= denr;
 
-    return *this;
+    return sstd_fraction_simplify ? *this->simplify() : *this;
   }
 
   fraction<T> operator--(int) {
@@ -774,7 +466,7 @@ class fraction {
 
     numr -= denr;
 
-    return *this;
+    return sstd_fraction_simplify ? *this->simplify() : *this;
   }
 
   // ANCHOR Arithmetic methods
@@ -799,27 +491,7 @@ class fraction {
       denr *= _fraction.denominator();
     }
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this->simplify() : *this;
   }
 
   /// @brief Adds a number to this.
@@ -835,27 +507,7 @@ class fraction {
 
     numr += toAdd * denr;
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 
   /// @brief Subtracts a fraction from this.
@@ -878,27 +530,7 @@ class fraction {
       denr *= _fraction.denominator();
     }
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 
   /// @brief Subtracts a number from this.
@@ -914,27 +546,7 @@ class fraction {
 
     numr -= toSub * denr;
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 
   /// @brief Multiplies a fraction to this.
@@ -953,27 +565,7 @@ class fraction {
     numr = _fraction.numerator() * numr;
     denr = _fraction.denominator() * denr;
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 
   /// @brief Multiplies a number to this.
@@ -989,27 +581,7 @@ class fraction {
 
     numr = numr * toMult;
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 
   /// @brief Divides this by a fraction.
@@ -1028,27 +600,7 @@ class fraction {
     numr *= _fraction.denominator();
     denr *= _fraction.numerator();
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 
   /// @brief Divides this by a number.
@@ -1064,27 +616,7 @@ class fraction {
 
     denr *= toDiv;
 
-    if (simplify) {
-      T highest;
-      if (numr == 0) {
-        highest = denr;
-      } else if (denr == 0)
-        throw new div0();
-      else {
-        unsigned long long xcpy = numr, ycpy = denr;
-        while (xcpy != ycpy) {
-          if (xcpy > ycpy)
-            xcpy = xcpy - ycpy;
-          else
-            ycpy = ycpy - xcpy;
-        }
-        highest = xcpy;
-      }
-      numr /= highest;
-      denr /= highest;
-    }
-
-    return *this;
+    return simplify ? *this.simplify() : *this;
   }
 };
 

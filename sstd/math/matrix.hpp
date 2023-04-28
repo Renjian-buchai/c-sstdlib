@@ -130,14 +130,14 @@ class matrix2 {
   constexpr size_t X() const { return sizeX; }
   constexpr size_t Y() const { return sizeY; }
   std::array<std::array<T, dX>, dY> matrix() const { return matx; }
-  T get(size_t _x, size_t _y) const {
+  T get(long _x, long _y) const {
     if (_x > sizeX)
       throw std::invalid_argument("_x not in range matrix.size()");
     if (_y > sizeY)
       throw std::invalid_argument("_y not in range matrix[0].size()");
     return matx[_x][_y];
   }
-  matrix2<T, dX, dY> get(size_t _x, size_t _y, T value) {
+  matrix2<T, dX, dY> get(long _x, long _y, T value) {
     if (_x > sizeX)
       throw std::invalid_argument("_x not in range matrix.size()");
     if (_y > sizeY)
