@@ -27,6 +27,7 @@
 #if !defined(SSTD_MATH_HPP)
 #define SSTD_MATH_HPP
 
+#include <sstd/math/.vector.hpp>
 #include <sstd/math/const.hpp>
 #include <sstd/math/conversion.hpp>
 #include <sstd/math/fraction.hpp>

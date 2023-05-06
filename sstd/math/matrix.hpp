@@ -44,11 +44,10 @@
 
 namespace sstd {
 
-template <class T, size_t dX, size_t dY>
+template <class T, size_t sizeX, size_t sizeY>
 class matrix2 {
  protected:
-  std::array<std::array<T, dX>, dY> matx;
-  size_t sizeX = dX, sizeY = dY;
+  T matx[sizeX][sizeY];
 
  public:
   // ANCHOR Constructors & destructors
@@ -60,13 +59,13 @@ class matrix2 {
   }
   template <class Iter>
   matrix2(const Iter begin, const Iter end) {
-    if (end - begin != dX * dY)
+    if (end - begin != sizeX * sizeY)
       throw std::invalid_argument(
           "Number of elements in container must be sizeX * sizeY");
     for (size_t i = 0, ii = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j, ++ii) matx[i][j] = *(begin + ii);
   }
-  matrix2(std::array<std::array<T, dX>, dY> _matrix) { matx = _matrix; }
+  matrix2(std::array<std::array<T, sizeX>, sizeY> _matrix) { matx = _matrix; }
 
   ~matrix2() {}
 
@@ -84,42 +83,42 @@ class matrix2 {
 
   // ANCHOR Arithmetic methods
   template <typename M>
-  matrix2<T, dX, dY> mult(M toMult) {
+  matrix2<T, sizeX, sizeY> mult(M toMult) {
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) matx[i][j] *= toMult;
     return *this;
   }
 
-  matrix2<T, dX, dY> add(matrix2<T, dX, dY> toAdd) {
+  matrix2<T, sizeX, sizeY> add(matrix2<T, sizeX, sizeY> toAdd) {
     if (toAdd.X() != sizeX)
       throw std::invalid_argument("Width of matrices must be equal");
     if (toAdd.Y() != sizeY)
       throw std::invalid_argument("Height of matrices must be equal");
     for (size_t i = 0; i < sizeX; ++i)
-      for (size_t j = 0; j < sizeY; ++j) matx[i][j] += toAdd.get(i, j);
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] += toAdd.at(i, j);
     return *this;
   }
 
-  matrix2<T, dX, dY> sub(matrix2<T, dX, dY> toAdd) {
+  matrix2<T, sizeX, sizeY> sub(matrix2<T, sizeX, sizeY> toAdd) {
     if (toAdd.X() != sizeX)
       throw std::invalid_argument("Width of matrices must be equal");
     if (toAdd.Y() != sizeY)
       throw std::invalid_argument("Height of matrices must be equal");
     for (size_t i = 0; i < sizeX; ++i)
-      for (size_t j = 0; j < sizeY; ++j) matx[i][j] -= toAdd.get(i, j);
+      for (size_t j = 0; j < sizeY; ++j) matx[i][j] -= toAdd.at(i, j);
     return *this;
   }
 
-  matrix2<T, dX, dY> negate() {
+  matrix2<T, sizeX, sizeY> negate() {
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) matx[i][j] = -matx[i][j];
     return *this;
   }
 
-  matrix2<T, dX, dY> transpose() {
+  matrix2<T, sizeX, sizeY> transpose() {
     if (sizeX != sizeY)
       throw invCall("Tronsposition can only be applied on square matrices");
-    std::array<std::array<T, dY>, dX> result;
+    std::array<std::array<T, sizeY>, sizeX> result;
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) result[i][j] = matx[j][i];
     matx = result;
@@ -129,15 +128,15 @@ class matrix2 {
   // ANCHOR Getter methods
   constexpr size_t X() const { return sizeX; }
   constexpr size_t Y() const { return sizeY; }
-  std::array<std::array<T, dX>, dY> matrix() const { return matx; }
-  T get(long _x, long _y) const {
+  std::array<std::array<T, sizeX>, sizeY> matrix() const { return matx; }
+  T at(size_t _x, size_t _y) const {
     if (_x > sizeX)
       throw std::invalid_argument("_x not in range matrix.size()");
     if (_y > sizeY)
       throw std::invalid_argument("_y not in range matrix[0].size()");
     return matx[_x][_y];
   }
-  matrix2<T, dX, dY> get(long _x, long _y, T value) {
+  matrix2<T, sizeX, sizeY> at(size_t _x, size_t _y, T value) {
     if (_x > sizeX)
       throw std::invalid_argument("_x not in range matrix.size()");
     if (_y > sizeY)
@@ -145,71 +144,79 @@ class matrix2 {
     matx[_x][_y] = value;
     return *this;
   }
+  inline std::array<T, sizeX> operator[](size_t index) { return matx[index]; }
+
+#ifdef SSTD_VECTOR2_HPP
+
+  // Somehow implement matrix-vector multiplication.
+
+#endif
 };
 
 #ifdef SSTD_PRINTCONT_HPP
 
-template <typename T, size_t dX, size_t dY>
-void print(const matrix2<T, dX, dY> _matrix) {
+template <typename T, size_t sizeX, size_t sizeY>
+void print(const matrix2<T, sizeX, sizeY> _matrix) {
   for (size_t i = 0; i < _matrix.X(); ++i) {
     for (size_t j = 0; j < _matrix.Y(); ++j)
-      std::cout << _matrix.get(i, j) << " ";
+      std::cout << _matrix.at(i, j) << " ";
     std::cout << "\n";
   }
 }
 
 #endif
 
-template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> add(const matrix2<T, dX, dY> _matrix,
-                       const matrix2<T, dX, dY> toAdd) {
+template <typename T, size_t sizeX, size_t sizeY>
+matrix2<T, sizeX, sizeY> add(const matrix2<T, sizeX, sizeY> _matrix,
+                             const matrix2<T, sizeX, sizeY> toAdd) {
   if (toAdd.X() != _matrix.X())
     throw std::invalid_argument("Width of matrices must be equal");
   if (toAdd.Y() != _matrix.Y())
     throw std::invalid_argument("Height of matrices must be equal");
-  matrix2<T, dX, dY> result;
-  for (int i = 0; i < dX; ++i)
-    for (int j = 0; j < dY; ++j)
-      result.get(i, j, _matrix.get(i, j) + toAdd.get(i, j));
+  matrix2<T, sizeX, sizeY> result;
+  for (int i = 0; i < sizeX; ++i)
+    for (int j = 0; j < sizeY; ++j)
+      result.at(i, j, _matrix.at(i, j) + toAdd.at(i, j));
   return result;
 }
 
-template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> sub(const matrix2<T, dX, dY> _matrix,
-                       const matrix2<T, dX, dY> toSub) {
+template <typename T, size_t sizeX, size_t sizeY>
+matrix2<T, sizeX, sizeY> sub(const matrix2<T, sizeX, sizeY> _matrix,
+                             const matrix2<T, sizeX, sizeY> toSub) {
   if (toSub.X() != _matrix.X())
     throw std::invalid_argument("Width of matrices must be equal");
   if (toSub.Y() != _matrix.Y())
     throw std::invalid_argument("Height of matrices must be equal");
-  matrix2<T, dX, dY> result;
-  for (int i = 0; i < dX; ++i)
-    for (int j = 0; j < dY; ++j)
-      result.get(i, j, _matrix.get[i][j] - toSub.get[i][j]);
+  matrix2<T, sizeX, sizeY> result;
+  for (int i = 0; i < sizeX; ++i)
+    for (int j = 0; j < sizeY; ++j)
+      result.at(i, j, _matrix.get[i][j] - toSub.get[i][j]);
   return result;
 }
 
-template <typename T, size_t dX, size_t dY>
-matrix2<T, dX, dY> mult(const matrix2<T, dX, dY> _matrix, const T toMult) {
-  matrix2<T, dX, dY> result;
-  for (size_t i = 0; i < dX; ++i)
-    for (size_t j = 0; j < dY; ++j)
-      result.get(i, j, _matrix.get(i, j) * toMult);
+template <typename T, size_t sizeX, size_t sizeY>
+matrix2<T, sizeX, sizeY> mult(const matrix2<T, sizeX, sizeY> _matrix,
+                              const T toMult) {
+  matrix2<T, sizeX, sizeY> result;
+  for (size_t i = 0; i < sizeX; ++i)
+    for (size_t j = 0; j < sizeY; ++j)
+      result.at(i, j, _matrix.at(i, j) * toMult);
   return result;
 }
 
-template <typename T, size_t dX, size_t temp, size_t dY>
-matrix2<T, dX, dY> mult(const matrix2<T, dX, temp> _matrix,
-                        const matrix2<T, temp, dY> toMult) {
+template <typename T, size_t sizeX, size_t temp, size_t sizeY>
+matrix2<T, sizeX, sizeY> mult(const matrix2<T, sizeX, temp> _matrix,
+                              const matrix2<T, temp, sizeY> toMult) {
   if (_matrix.Y() != toMult.X())
     throw std::invalid_argument(
         "Height of _matrix must equal to width of toMult");
-  matrix2<T, dX, dY> result;
-  for (int i = 0; i < dY; ++i)
-    for (int j = 0; j < dX; ++j) {
+  matrix2<T, sizeX, sizeY> result;
+  for (int i = 0; i < sizeY; ++i)
+    for (int j = 0; j < sizeX; ++j) {
       T sum = 0;
       for (int ii = 0; ii < temp; ++ii)
-        sum += _matrix.get(i, ii) * toMult.get(ii, j);
-      result.get(i, j, sum);
+        sum += _matrix.at(i, ii) * toMult.at(ii, j);
+      result.at(i, j, sum);
     }
   return result;
 }
