@@ -2,7 +2,7 @@
  * This file is a part of the SubStandard C++ library.
  *
  * Developed for my own convenience in the future.
- * This product includes software developed by myself.h
+ * This product includes software developed by myself.
  * (Insert website here if I ever decide to make it)
  * See the COPYRIGHT file at the top-level directory of this distribution
  * for details of code security.
@@ -24,10 +24,28 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_DATASTRUCT_HPP)
-#define SSTD_DATASTRUCT_HPP
+#if !defined(SSTD_CONTIFY_HPP)
 
-#include <sstd/dataStruct/binaryTree.hpp>
-#include <sstd/dataStruct/sorted_array.hpp>
+#include <algorithm>
+
+namespace sstd {
+
+// #if defined(_GLIBXX_ARRAY)
+template <typename T, size_t N, typename Iter>
+std::array<T, N> arrify(const Iter begin, const Iter end) {
+  std::array<T, N> arr;
+  std::copy(begin, end, arr.begin());
+  return arr;
+}
+// #endif
+
+// #if defined(_GLIBXX_VECTOR)
+template <typename T, typename Iter>
+std::vector<T> vecify(Iter begin, Iter end) {
+  return std::vector<T>(begin, end);
+}
+// #endif
+
+}  // namespace sstd
 
 #endif

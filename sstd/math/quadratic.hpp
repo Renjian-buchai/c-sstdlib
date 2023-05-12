@@ -28,48 +28,52 @@
 
 #include <array>
 #include <cmath>
+#include <complex>
+#include <exception>
+#include <utility>
 
 namespace sstd {
 
-/// @brief Solves for roots of quadratic equation in the fastest time.
-/// @tparam T Any arithmetic type.
-/// @param squared x^2 term.
-/// @param linear x term.
-/// @param constant constant term.
+/// @brief Solves for real roots of quadratic equation.
+/// @tparam T Any float type. Default=double
+/// @param a Quadratic coefficient.
+/// @param b Linear coefficient.
+/// @param c Constant term.
 /// @throw Domain error if b * b - 4 * a * c < 0.
 /// @return Roots of equation in 2-size std::array. std::array[0] is the minus
 /// value, std::array[1] is the plus value.
-template <typename T>
-std::array<T, 2> qd(T squared, T linear, T constant) {
-  return std::array<T, 2>{
-    (-linear - std::sqrt(linear * linear - 4 * squared * constant)) * 0.5 /
-        squared,
-    (-linear + std::sqrt(linear * linear - 4 * squared * constant)) * 0.5 /
-        squared)};
+template <typename T = double>
+std::pair<T, T> rqd(const T a, const T b, const T c) {
+  const T disc = b * b - 4 * a * c;
+  if (disc < 0)
+    throw new std::invalid_argument("Only defined if b * b - 4ac >= 0");
+  return std::pair<T, T>{(-b - std::sqrt(disc)) * 0.5 / a,
+                         (-b + std::sqrt(disc)) * 0.5 / a};
 }
 
 /// @brief Solves for roots of quadratic equation.
-/// @tparam T Any arithmetic type.
-/// @param squared x^2 term.
-/// @param linear x term.
-/// @param constant constant term.
-/// @return Roots of equation in 4-size std::array. std::array[0] contains the
-/// real component of the minus value, std::array[1] contains the imaginary
-/// component of the minus value, std::array[2] contains the real component of
-/// the plus value, std::array[3] contains the imaginary component of the plus
-/// value.
-template <typename T>
-std::array<T, 4> quadratic(T squared, T linear, T constant) {
-  long double disc = linear * linear - 4 * squared * constant;
-
-  if (disc < 0) {
-    return std::array<T, 4>{
-        -linear * 0.5 / a, -std::sqrt(std::fabs(disc)) * 0.5 / a,
-        -linear * 0.5 / a, std::sqrt(std::fabs(disc)) * 0.5 / a};
-  } else {
-    return std::array<T, 2>{(-linear - std::sqrt(disc)) * 0.5 / squared, 0,
-                            (-linear + std::sqrt(disc)) * 0.5 / squared, 0};
-  }
+/// @tparam T Any float type. Default=double
+/// @param a Quadratic coefficient.
+/// @param b Linear coefficient.
+/// @param c Constant term.
+/// @return Roots of equation in a 2-size std::array of complex numbers.
+/// std::array[0] is the minus value, std::array[1] is the plus value.
+template <typename T = double>
+std::pair<std::complex<T>, std::complex<T>> qd(const T a, const T b,
+                                               const T c) {
+  const T disc = b * b - 4 * a * c;
+  return (disc < 0)
+             ? std::pair<std::complex<T>, std::complex<T>>{std::complex<T>{
+                                                               -b * 0.5 / a,
+                                                               -sqrt(-disc) *
+                                                                   0.5 / a},
+                                                           std::complex<T>{
+                                                               -b * 0.5 / a,
+                                                               sqrt(-disc) *
+                                                                   0.5 / a}}
+             : std::pair<std::complex<T>, std::complex<T>>{
+                   std::complex<T>{(-b - std::sqrt(disc)) * 0.5 / a, 0},
+                   std::complex<T>{(-b + std::sqrt(disc)) * 0.5 / a, 0}};
 }
 
 }  // namespace sstd

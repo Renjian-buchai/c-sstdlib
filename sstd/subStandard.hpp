@@ -29,6 +29,9 @@
 
 #include <sstd/.io.hpp>
 #include <sstd/dataStruct.hpp>
+#include <sstd/exception.hpp>
 #include <sstd/math.hpp>
+#include <sstd/stat.hpp>
+#include <sstd/util.hpp>
 
 #endif /* SSTD_HPP */

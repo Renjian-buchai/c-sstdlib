@@ -2,7 +2,7 @@
  * This file is a part of the SubStandard C++ library.
  *
  * Developed for my own convenience in the future.
- * This product includes software developed by myself.h
+ * This product includes software developed by myself.
  * (Insert website here if I ever decide to make it)
  * See the COPYRIGHT file at the top-level directory of this distribution
  * for details of code security.
@@ -24,10 +24,22 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_DATASTRUCT_HPP)
-#define SSTD_DATASTRUCT_HPP
+#if !defined(SSTD_MEDIAN_HPP)
+#define SSTD_MEDIAN_HPP
 
-#include <sstd/dataStruct/binaryTree.hpp>
-#include <sstd/dataStruct/sorted_array.hpp>
+#include <algorithm>
+#include <iostream>
+#include <type_traits>
+#include <vector>
+
+namespace sstd {
+
+template <typename FLOAT, typename Iter>
+FLOAT median(const Iter begin, const Iter end) {
+  std::vector<FLOAT> copy;
+  std::copy(begin, end, copy.begin());
+}
+
+}  // namespace sstd
 
 #endif
