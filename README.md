@@ -13,21 +13,36 @@ A substandard library for C++, containing some random functions for convenience
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Included features
+
+- Fraction class
+- Matrix class 
+- Vector class
+  - Vector2 optimisation
+  - Vector3 optimisation
+- Exception class
+  - Division by 0 optimised exception class
+  - Invalid call optimised exception class 
+- Conversions
+  - Angle units
+  - Complex number forms
+- Common mathematical and physical constants 
+- Quadratic equation solver
+- Container printing class
+
+## Incomplete features 
+
+- Binary tree class
+
 ## Built with
 
-- C++
+- Clang++ 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Dependencies
 
-- Boost
-  Install from the [boost website](www.boost.org)
-  Add
-  '''
-  -Ipath/to/boost
-  '''
-  to your compiler arguments or include settings.
+None! This library will be dependency free. If any are ever added, an installation of it will be included. 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -36,9 +51,9 @@ A substandard library for C++, containing some random functions for convenience
 1. Download distributable from `Releases` section
 2. Unzip it.
 
-If you are using a compiler (e.g. GNU/g++, LLVM/clang), add the following flag when compiling `-I path/to/library/sstd`. This sstd should be the working directory of the library, not the include directory of the library.
+If you are using a compiler (e.g. GNU/g++, LLVM/clang), add the following flag when compiling `-I path/to/library/(sstd)`. This sstd should be the top-level directory of the library, not the sstd directory of the library.
 
-If you are using an IDE (e.g. code::blocks), go to compiler settings -> additional include paths and add `path/to/library/sstd` to it. For instructions specific to your IDE, please visit the IDE's documentation.
+If you are using an IDE (e.g. code::blocks), go to compiler settings -> additional include paths and add `path/to/library/(sstd)` to it. For instructions specific to your IDE, please visit the IDE's documentation.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -65,7 +80,7 @@ Distributed under the Creative Commons Attribution-NonCommercial-ShareAlike Lice
 
 ## Minimum C++ version
 
-I don't know, probably around 2020 to be safe.
+[C++17](https://en.cppreference.com/w/cpp/17)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
