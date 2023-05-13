@@ -27,18 +27,22 @@
 #if !defined(SSTD_DIV0_HPP)
 #define SSTD_DIV0_HPP
 
-#include <stdexcept>
+#include <exception>
+#include <string>
 
 class div0 : std::exception {
+  using std::exception::what;
+
  private:
-  char* message = (char*)"DivideByZeroError";  // Typecast to remove warning
+  const char* message =
+      (char*)"DivideByZeroError";  // Typecast to remove warning
 
  public:
   div0() = default;
 
-  div0(char* _message) { message = _message; }
+  div0(std::string _message) { message = _message.c_str(); }
 
-  char* what() { return message; }
+  const char* what() const noexcept override { return message; }
 };
 
 #endif

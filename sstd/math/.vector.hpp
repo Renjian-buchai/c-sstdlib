@@ -41,8 +41,8 @@ class vector {
 
  public:
   vector() = default;
-  template <class Iter>
-  vector(const Iter begin, const Iter end) {
+  template <class const_iter>
+  vector(const const_iter begin, const const_iter end) {
     if (end - begin != N) {
       throw std::invalid_argument("Size of range is wrong");
     }
@@ -152,8 +152,8 @@ class vector<T, 2> {
 
  public:
   vector() = default;
-  template <class Iter>
-  vector(const Iter begin, const Iter end) {
+  template <class const_iter>
+  vector(const const_iter begin, const const_iter end) {
     if (end - begin != 2) {
       throw std::invalid_argument("Size of range is wrong");
     }
@@ -221,7 +221,8 @@ class vector<T, 2> {
   }
   vector<T, 2> operator++(int) {
     vector<T, 2> copy = *this;
-    ++vec[0]++ vec[1];
+    ++vec[0];
+    ++vec[1];
     return copy;
   }
   vector<T, 2> operator--(int) {
@@ -243,8 +244,8 @@ class vector<T, 3> {
 
  public:
   vector() = default;
-  template <class Iter>
-  vector(const Iter begin, const Iter end) {
+  template <class const_iter>
+  vector(const const_iter begin, const const_iter end) {
     if (end - begin != 3) {
       throw std::invalid_argument("Size of range is wrong");
     }
@@ -277,16 +278,16 @@ class vector<T, 3> {
   inline T operator[](size_t index) const { return vec[index]; }
   inline T& operator[](size_t index) { return vec[index]; }
   vector<T, 3> operator+(const vector<T, 3> _vector) const {
-    return std::vector<T, 3>{vec[0] + _vector[0], vec[1] + _vector[1],
-                             vec[2] + _vector[2]};
+    return vector<T, 3>{vec[0] + _vector[0], vec[1] + _vector[1],
+                        vec[2] + _vector[2]};
   }
   vector<T, 3> operator-(const vector<T, 3> _vector) const {
-    return std::vector<T, 3>{vec[0] - _vector[0], vec[1] - _vector[1],
-                             vec[2] - _vector[2]};
+    return vector<T, 3>{vec[0] - _vector[0], vec[1] - _vector[1],
+                        vec[2] - _vector[2]};
   }
   template <class A>
   vector<T, 3> operator*(const A _num) const {
-    return std::vector<T, 3>{vec[0] * _num, vec[1] * _num, vec[2] * _num};
+    return vector<T, 3>{vec[0] * _num, vec[1] * _num, vec[2] * _num};
   }
   vector<T, 3> operator+=(const vector<T, 3> _vector) {
     vec[0] += _vector[0];
@@ -302,9 +303,9 @@ class vector<T, 3> {
   }
   template <class A>
   vector<T, 3> operator*=(const A _num) {
-    vec[0] *= _vector[0];
-    vec[1] *= _vector[1];
-    vec[2] *= _vector[2];
+    vec[0] *= _num;
+    vec[1] *= _num;
+    vec[2] *= _num;
     return *this;
   }
   vector<T, 3> operator++() {
@@ -344,9 +345,7 @@ template <typename T, size_t N>
 void print(const vector<T, N> _vector) {
   print(_vector.cbegin(), _vector.cend());
 }
-}
 #endif
-
 }  // namespace sstd
 
 #endif

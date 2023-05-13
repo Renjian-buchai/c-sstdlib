@@ -33,17 +33,14 @@
 namespace sstd {
 
 /// @brief Prints a container.
-/// @tparam Iter : Iterator
-/// @param begin container::begin()
+/// @tparam const_iter : Iterator
+/// @param begin container.begin()
 /// @param end container.end()
-template <typename Iter>
-void print(const Iter begin, const Iter end) {
-  Iter focus = begin, last = end;
-  --last;
+template <typename const_iter>
+void print(const_iter begin, const_iter end) {
   std::cout << "{";
-  for (; focus != (last); ++focus) std::cout << *focus << ", ";
-  std::cout << *last << "}";
-  return;
+  for (; begin != end; ++begin) std::cout << *begin << ", ";
+  std::cout << *(--end) << "}";
 }
 
 }  // namespace sstd

@@ -28,22 +28,24 @@
 #define SSTD_INVCALL_HPP
 
 #include <exception>
+#include <string>
 
 namespace sstd {
 
 /// @brief Exception class for a method call from a bad object.
 class invCall : std::exception {
  private:
-  char* message = (char*)"InvalidCallException";  // Typecast to remove warning
+  const char* message =
+      (char*)"InvalidCallException";  // Typecast to remove warning
 
  public:
   invCall() = default;
 
   /// @brief Sets the message.
   /// @param _message Exception message. Default="InvalidCallException"
-  invCall(char* _message) { message = _message; }
+  invCall(std::string _message) { message = _message.c_str(); }
 
-  char* what() { return message; }
+  const char* what() const noexcept override { return message; }
 };
 
 }  // namespace sstd
