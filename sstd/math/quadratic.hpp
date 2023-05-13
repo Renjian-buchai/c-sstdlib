@@ -43,7 +43,7 @@ namespace sstd {
 /// @return Roots of equation in 2-size std::array. std::array[0] is the minus
 /// value, std::array[1] is the plus value.
 template <typename T = double>
-std::pair<T, T> rqd(const T a, const T b, const T c) {
+std::pair<T, T> rquadratic(const T a, const T b, const T c) {
   const T disc = b * b - 4 * a * c;
   if (disc < 0)
     throw new std::invalid_argument("Only defined if b * b - 4ac >= 0");
@@ -59,8 +59,8 @@ std::pair<T, T> rqd(const T a, const T b, const T c) {
 /// @return Roots of equation in a 2-size std::array of complex numbers.
 /// std::array[0] is the minus value, std::array[1] is the plus value.
 template <typename T = double>
-std::pair<std::complex<T>, std::complex<T>> qd(const T a, const T b,
-                                               const T c) {
+std::pair<std::complex<T>, std::complex<T>> quadratic(const T a, const T b,
+                                                      const T c) {
   const T disc = b * b - 4 * a * c;
   return (disc < 0)
              ? std::pair<std::complex<T>, std::complex<T>>{std::complex<T>{

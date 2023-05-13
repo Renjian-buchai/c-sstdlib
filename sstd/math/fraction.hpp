@@ -283,12 +283,21 @@ class fraction {
                                    static_cast<integ>(exp)};
     }
   }
+
+  std::string tostr() {
+    return sstd_fraction_simplify
+               ? denr == 1 ? std::to_string(numr)
+                           : std::to_string(numr) + "/" + std::to_string(denr)
+               : std::to_string(numr) + "/" + std::to_string(denr);
+  }
 };
 
 #if defined(SSTD_PRINTCONT_HPP)
 
 template <typename T>
-void print(fraction<T>);
+void print(fraction<T> _fraction) {
+  std::cout << _fraction.cnumer() << "/" << _fraction.cdenom();
+}
 
 #endif
 
