@@ -33,46 +33,39 @@
 #include <limits>
 #include <random>
 #include <type_traits>
-
-/// @brief Template to enable template if Condition evaluates true.
-/// @tparam Condition : condition to evaluate.
-/// @tparam T : template.
-/// @note example: template <typename T, EnableIf<std::is_arithmetic<T>>>
+#include <utility>
 
 using namespace std;
 
 namespace sstd {
-/// @brief Finds the highest common faction of two positive integers
-/// @param x unsigned long long.
-/// @param y unsigned long long.
-/// @return Highest common factor of x and y.
-unsigned long long hcf(unsigned long long x, unsigned long long y) {
+template <typename uns_int>
+uns_int hcf(const uns_int x, const uns_int y) {
   // Fucking cancerous
   // Guard clauses
-  if (x == 0)
+  if (x == 0) {
     return y;
-  else if (y == 0)
+  } else if (y == 0) {
     return x;
-
-  while (x != y) {
-    if (x > y)
-      x = x - y;
-    else
-      y = y - x;
   }
 
-  return x;
+  {
+    uns_int xcpy = x, ycpy = y;
+    while (xcpy != ycpy) {
+      if (xcpy > ycpy) {
+        xcpy -= ycpy;
+      } else {
+        ycpy -= xcpy;
+      }
+    }
+
+    return xcpy;
+  }
 }
 
-/// @brief Finds the lowest common multiple of two positive integers.
-/// @param x unsigned long long.
-/// @param y unsigned long long.
-/// @return Lowest common multiple of x and y.
-unsigned long long lcm(unsigned long long x, unsigned long long y) {
+template <typename uns_int>
+uns_int lcm(const uns_int x, const uns_int y) {
   // Using principle lcm = xy/hcf
-  unsigned long long hcf,
-      xcpy = x,
-      ycpy = y;  // Save time on init hcf because it's assigned not augmented.
+  uns_int hcf;
   if (x == 0) {
     hcf = y;
     goto lcm00;
@@ -81,25 +74,26 @@ unsigned long long lcm(unsigned long long x, unsigned long long y) {
     goto lcm00;
   }
 
-  while (xcpy != ycpy) {
-    if (xcpy > ycpy)
-      xcpy = xcpy - ycpy;
-    else
-      ycpy = ycpy - xcpy;
+  {
+    uns_int xcpy = x, ycpy = y;
+    while (xcpy != ycpy) {
+      if (xcpy > ycpy) {
+        xcpy -= ycpy;
+      } else {
+        ycpy -= xcpy;
+      }
+    }
+    hcf = xcpy;
   }
-  hcf = xcpy;
-
 // Technically can use do-while, break, but goto would be faster since no
 // conditions need to be evaluated.
+// I hate this so much
 lcm00:
   return (x * y) / hcf;
 }
 
-/// @brief Quake III quick inverse square root. Single precision.
-/// @param x Value to find inverse square root for.
-/// @return Inverse square root.
-/// @warning Undefined behaviour.
 double qisqrt(double x) {
+  // The double is important. Don't replace with template
   double y = x;
   double x2 = y * 0.5;
   std::int64_t i = *(std::int64_t *)&y;
@@ -109,10 +103,6 @@ double qisqrt(double x) {
   return y;
 }
 
-/// @brief Quake III quick inverse square root. Double precision.
-/// @param x Value to find inverse square root for.
-/// @return Inverse square root.
-/// @warning Undefined behaviour.
 double q_isqrt(double x) {
   double y = x;
   double x2 = y * 0.5;
@@ -124,11 +114,6 @@ double q_isqrt(double x) {
   return y;
 }
 
-/// @brief Quake III quick inverse square root. Variable precision.
-/// @param x Value to find inverse square root for.
-/// @param precision Precision of estimate.
-/// @return Inverse square root.
-/// @warning Undefined behaviour.
 double qisqrt(double x, size_t precision) {
   double y = x;
   double x2 = y * 0.5;
@@ -139,16 +124,9 @@ double qisqrt(double x, size_t precision) {
   return y;
 }
 
-/// @brief Finds the quotient and remainder of a function.
-/// @tparam intType : Any integral value.
-/// @param x Dividend.
-/// @param y Divisor.
-/// @return std::array<intType, 2>. Index 0 is quotient, index 1 is remainder.
-std::array<long long, 2> divmod(long long x, long long y) {
-  std::array<long long, 2> eax{x, y};
-  eax[0] = (int)x / y;
-  eax[1] = x % y;
-  return eax;
+template <typename Int>
+std::pair<Int, Int> divmod(Int x, Int y) {
+  return std::pair<Int, Int> { std::floor(x / y), x % y }
 }
 
 }  // namespace sstd

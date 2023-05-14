@@ -30,17 +30,6 @@
 #include <cmath>
 #include <utility>
 
-#if !defined(_PI_)
-#define _PI_ \
-  3.1415926535'8979323846'2643383279'5028841971'6939937510'5820974944'5923078164'0628620899'8628034825'3421170679
-#endif
-
-#define SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS \
-  0.0055555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555'5555555555
-#define SSTD_RECIPROCALOF200_BECAUSEOF_OPTIMISATION_REASONS 0.005
-#define RECPIROCALOFPI \
-  0.3183098861'8379067153'7767526745'0287240689'1929148091'2897495334'6881177935'9526845307'0180227605'5325061719
-
 namespace sstd {
 
 /// @brief Converts degrees to radians.
@@ -49,7 +38,9 @@ namespace sstd {
 /// @return Angle in radians.
 template <typename floatType>
 floatType dTR(floatType degree) {
-  return degree * _PI_ * SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS;
+  // pi / 180
+  return degree *
+         0.0174532925199432957692369076848861271344287188854172545609719144017100911460344944368224156963450948;
 }
 
 /// @brief Converts degrees to gradians.
@@ -58,7 +49,9 @@ floatType dTR(floatType degree) {
 /// @return Angle in gradians.
 template <typename floatType>
 floatType dTG(floatType degree) {
-  return degree * 200 * SSTD_RECIPROCALOF180_BECAUSEOF_OPTIMISATION_REASONS;
+  // 200 / 180
+  return degree *
+         1.1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111;
 }
 
 /// @brief Converts radians to degrees.
@@ -67,7 +60,9 @@ floatType dTG(floatType degree) {
 /// @return Angle in degrees.
 template <typename floatType>
 floatType rTD(floatType radian) {
-  return radian * 180 * RECPIROCALOFPI;
+  // 180 / PI
+  return radian *
+         57.2957795130823208767981548141051703324054724665643215491602438612028471483215526324409689958511109441;
 }
 
 /// @brief Converts radians to gradians.
@@ -76,7 +71,9 @@ floatType rTD(floatType radian) {
 /// @return Angle in gradians.
 template <typename floatType>
 floatType rTG(floatType radian) {
-  return radian * 200 * RECPIROCALOFPI;
+  // 200 / PI
+  return radian *
+         63.6619772367581343075535053490057448137838582961825794990669376235587190536906140360455211065012343824;
 }
 
 /// @brief Converts gradians to radians.
@@ -85,7 +82,9 @@ floatType rTG(floatType radian) {
 /// @return Angle in radians
 template <typename floatType>
 floatType gTR(floatType gradian) {
-  return gradian * _PI_ * SSTD_RECIPROCALOF200_BECAUSEOF_OPTIMISATION_REASONS;
+  // PI / 200
+  return gradian *
+         0.0157079632679489661923132169163975144209858469968755291048747229615390820314310449931401741267105853;
 }
 
 /// @brief Converts radians to gradians.
@@ -94,6 +93,7 @@ floatType gTR(floatType gradian) {
 /// @return Angle in radians.
 template <typename floatType>
 floatType gTD(floatType gradian) {
+  // 180 / 200
   return gradian * 0.9;
 }
 
