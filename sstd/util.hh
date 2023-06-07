@@ -21,13 +21,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see
+ * 
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_EXCEPTION_HPP)
-#define SSTD_EXCEPTION_HPP
+#ifndef SSTD_UTIL_HPP
 
-#include <sstd/except/div0.hpp>
-#include <sstd/except/invCall.hpp>
+#include <sstd/util/contify.hh>
 
 #endif

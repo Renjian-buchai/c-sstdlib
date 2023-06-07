@@ -24,9 +24,12 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_QUADRATIC_HPP)
+#if !defined(SSTD_QUADRATIC_HH)
+#define SSTD_QUADRATIC_HH
 
 #include <array>
+
+
 #include <cmath>
 #include <complex>
 #include <exception>

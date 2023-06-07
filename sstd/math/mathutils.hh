@@ -24,8 +24,8 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_MATHUTILS_HPP)
-#define SSTD_MATHUTILS_HPP
+#if !defined(SSTD_MATHUTILS_HH)
+#define SSTD_MATHUTILS_HH
 
 #include <array>
 #include <cstdlib>
@@ -131,4 +131,4 @@ std::pair<Int, Int> divmod(Int x, Int y) {
 
 }  // namespace sstd
 
-#endif /* MATHUTILS_HPP */
+#endif /* MATHUTILS_HH */

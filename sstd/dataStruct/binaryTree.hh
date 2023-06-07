@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef SSTD_BINTREE_HPP
-#define SSTD_BINTREE_HPP
+#ifndef SSTD_BINTREE_HH
+#define SSTD_BINTREE_HH
 
 #include <array>
 #include <iostream>
@@ -212,7 +212,7 @@ class binTree {
 //     return focus;
 //   }
 //
-// #ifdef SSTD_PRINTCONT_HPP
+// #ifdef SSTD_PRINTCONT_HH
 //   /// @brief Preorder traverses and prints a binary tree.
 //   /// @tparam T : Any arithmetic type.
 //   /// @param focus Node focus.

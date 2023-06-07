@@ -40,8 +40,8 @@
  * - When possible, multiply by fractions or integers instead of floats.
  */
 
-#if !defined(SSTD_FRACTION_HPP)
-#define SSTD_FRACTION_HPP
+#if !defined(SSTD_FRACTION_HH)
+#define SSTD_FRACTION_HH
 
 #include <algorithm>
 #include <cmath>
@@ -49,7 +49,7 @@
 #include <initializer_list>
 #include <iomanip>
 #include <iostream>
-#include <sstd/except/div0.hpp>  // sstd::div0
+#include <sstd/except/div0.hh>  // sstd::div0
 #include <type_traits>
 
 namespace sstd {
@@ -97,7 +97,7 @@ class fraction {
 
   ~fraction(){};
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
 
   void print() const {
     if (denr == 0) {
@@ -292,7 +292,7 @@ class fraction {
   }
 };
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
 
 template <typename T>
 void print(fraction<T> _fraction) {
@@ -303,4 +303,4 @@ void print(fraction<T> _fraction) {
 
 }  // namespace sstd
 
-#endif /* FRACTION_HPP */
+#endif /* FRACTION_HH */

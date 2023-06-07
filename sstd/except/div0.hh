@@ -24,8 +24,25 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_UTIL_HPP
+#if !defined(SSTD_DIV0_HH)
+#define SSTD_DIV0_HH
 
-#include <sstd/util/contify.hpp>
+#include <exception>
+#include <string>
+
+class div0 : std::exception {
+  using std::exception::what;
+
+ private:
+  const char* message =
+      (char*)"DivideByZeroError";  // Typecast to remove warning
+
+ public:
+  div0() = default;
+
+  div0(std::string _message) { message = _message.c_str(); }
+
+  const char* what() const noexcept override { return message; }
+};
 
 #endif

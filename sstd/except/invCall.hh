@@ -24,9 +24,30 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_IO_HPP)
-#define SSTD_IO_HPP
+#ifndef SSTD_INVCALL_HH
+#define SSTD_INVCALL_HH
 
-#include <sstd/.io/printCont.hpp>
+#include <exception>
+#include <string>
 
-#endif /* IO_HPP */
+namespace sstd {
+
+/// @brief Exception class for a method call from a bad object.
+class invCall : std::exception {
+ private:
+  const char* message =
+      (char*)"InvalidCallException";  // Typecast to remove warning
+
+ public:
+  invCall() = default;
+
+  /// @brief Sets the message.
+  /// @param _message Exception message. Default="InvalidCallException"
+  invCall(std::string _message) { message = _message.c_str(); }
+
+  const char* what() const noexcept override { return message; }
+};
+
+}  // namespace sstd
+
+#endif

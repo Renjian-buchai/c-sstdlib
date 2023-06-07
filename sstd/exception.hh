@@ -1,3 +1,4 @@
+
 /*
  * This file is a part of the SubStandard C++ library.
  *
@@ -24,25 +25,10 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_DIV0_HPP)
-#define SSTD_DIV0_HPP
+#if !defined(SSTD_EXCEPTION_HPP)
+#define SSTD_EXCEPTION_HPP
 
-#include <exception>
-#include <string>
-
-class div0 : std::exception {
-  using std::exception::what;
-
- private:
-  const char* message =
-      (char*)"DivideByZeroError";  // Typecast to remove warning
-
- public:
-  div0() = default;
-
-  div0(std::string _message) { message = _message.c_str(); }
-
-  const char* what() const noexcept override { return message; }
-};
+#include <sstd/except/div0.hh>
+#include <sstd/except/invCall.hh>
 
 #endif

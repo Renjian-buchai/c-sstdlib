@@ -27,12 +27,12 @@
 #if !defined(SSTD_MATH_HPP)
 #define SSTD_MATH_HPP
 
-#include <sstd/math/.vector.hpp>
-#include <sstd/math/const.hpp>
-#include <sstd/math/conversion.hpp>
-#include <sstd/math/fraction.hpp>
-#include <sstd/math/mathutils.hpp>
-#include <sstd/math/matrix.hpp>
-#include <sstd/math/quadratic.hpp>
+#include <sstd/math/.vector.hh>
+#include <sstd/math/const.hh>
+#include <sstd/math/conversion.hh>
+#include <sstd/math/fraction.hh>
+#include <sstd/math/mathutils.hh>
+#include <sstd/math/matrix.hh>
+#include <sstd/math/quadratic.hh>
 
 #endif /* MATH_HPP */

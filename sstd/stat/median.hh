@@ -24,29 +24,21 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#ifndef SSTD_INVCALL_HPP
-#define SSTD_INVCALL_HPP
+#if !defined(SSTD_MEDIAN_HH)
+#define SSTD_MEDIAN_HH
 
-#include <exception>
-#include <string>
+#include <algorithm>
+#include <iostream>
+#include <type_traits>
+#include <vector>
 
 namespace sstd {
 
-/// @brief Exception class for a method call from a bad object.
-class invCall : std::exception {
- private:
-  const char* message =
-      (char*)"InvalidCallException";  // Typecast to remove warning
-
- public:
-  invCall() = default;
-
-  /// @brief Sets the message.
-  /// @param _message Exception message. Default="InvalidCallException"
-  invCall(std::string _message) { message = _message.c_str(); }
-
-  const char* what() const noexcept override { return message; }
-};
+template <typename FLOAT, typename Iter>
+FLOAT median(const Iter begin, const Iter end) {
+  std::vector<FLOAT> copy;
+  std::copy(begin, end, copy.begin());
+}
 
 }  // namespace sstd
 

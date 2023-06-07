@@ -107,12 +107,12 @@ class sorted_array {
 
   constexpr size_t max_size() const noexcept { return arr.max_size(); }
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
   void print() const { print(arr.cbegin(), arr.cend()); }
 #endif
 };
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
 template <typename T, size_t N>
 void print(sorted_array<T, N> base_array) {
   print(base_array.cbegin(), base_array.cend());

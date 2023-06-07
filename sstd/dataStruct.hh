@@ -2,7 +2,7 @@
  * This file is a part of the SubStandard C++ library.
  *
  * Developed for my own convenience in the future.
- * This product includes software developed by myself.
+ * This product includes software developed by myself.h
  * (Insert website here if I ever decide to make it)
  * See the COPYRIGHT file at the top-level directory of this distribution
  * for details of code security.
@@ -24,25 +24,10 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_PRINTCONT_HPP)
-#define SSTD_PRINTCONT_HPP
+#if !defined(SSTD_DATASTRUCT_HPP)
+#define SSTD_DATASTRUCT_HPP
 
-#include <algorithm>  // std::reverse
-#include <iostream>   // std::cout
-
-namespace sstd {
-
-/// @brief Prints a container.
-/// @tparam const_iter : Iterator
-/// @param begin container.begin()
-/// @param end container.end()
-template <typename const_iter>
-void print(const_iter begin, const_iter end) {
-  std::cout << "{";
-  for (; begin != end; ++begin) std::cout << *begin << ", ";
-  std::cout << *(--end) << "}";
-}
-
-}  // namespace sstd
+#include <sstd/dataStruct/binaryTree.hh>
+#include <sstd/dataStruct/sorted_array.hh>
 
 #endif

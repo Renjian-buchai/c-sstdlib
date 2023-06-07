@@ -24,14 +24,29 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_HPP)
-#define SSTD_HPP
+#if !defined(SSTD_CONTIFY_HH)
+#define SSTD_CONTIFY_HH
 
-#include <sstd/.io.hpp>
-#include <sstd/dataStruct.hpp>
-#include <sstd/exception.hpp>
-#include <sstd/math.hpp>
-#include <sstd/stat.hpp>
-#include <sstd/util.hpp>
+#include <algorithm>
 
-#endif /* SSTD_HPP */
+namespace sstd {
+
+#if defined(_GLIBXX_ARRAY)
+template <typename T, size_t N, typename Iter>
+std::array<T, N> arrify(const Iter begin, const Iter end) {
+  std::array<T, N> arr;
+  std::copy(begin, end, arr.begin());
+  return arr;
+}
+#endif
+
+#if defined(_GLIBXX_VECTOR)
+template <typename T, typename Iter>
+std::vector<T> vecify(Iter begin, Iter end) {
+  return std::vector<T>(begin, end);
+}
+#endif
+
+}  // namespace sstd
+
+#endif

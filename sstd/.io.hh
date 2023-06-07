@@ -24,22 +24,9 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_MEDIAN_HPP)
-#define SSTD_MEDIAN_HPP
+#if !defined(SSTD_IO_HPP)
+#define SSTD_IO_HPP
 
-#include <algorithm>
-#include <iostream>
-#include <type_traits>
-#include <vector>
+#include <sstd/.io/printCont.hh>
 
-namespace sstd {
-
-template <typename FLOAT, typename Iter>
-FLOAT median(const Iter begin, const Iter end) {
-  std::vector<FLOAT> copy;
-  std::copy(begin, end, copy.begin());
-}
-
-}  // namespace sstd
-
-#endif
+#endif /* IO_HPP */

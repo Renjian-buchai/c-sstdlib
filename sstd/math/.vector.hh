@@ -24,8 +24,8 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_VECTOR2_HPP)
-#define SSTD_VECTOR2_HPP
+#if !defined(SSTD_VECTOR2_HH)
+#define SSTD_VECTOR2_HH
 
 #include <algorithm>
 #include <initializer_list>
@@ -140,7 +140,7 @@ class vector {
     return copy;
   }
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
   void print() const { print(cbegin(), cend()); }
 #endif
 };
@@ -232,7 +232,7 @@ class vector<T, 2> {
     return copy;
   }
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
   void print() const { sstd::print(cbegin(), cend()); }
 #endif
 };
@@ -335,12 +335,12 @@ class vector<T, 3> {
     return copy;
   }
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
   void print() const;
 #endif
 };
 
-#if defined(SSTD_PRINTCONT_HPP)
+#if defined(SSTD_PRINTCONT_HH)
 template <typename T, size_t N>
 void print(const vector<T, N> _vector) {
   print(_vector.cbegin(), _vector.cend());

@@ -24,8 +24,8 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_STD_DEVIATION_HPP)
-#define SSTD_STD_DEVIATION_HPP
+#if !defined(SSTD_STD_DEVIATION_HH)
+#define SSTD_STD_DEVIATION_HH
 
 #include <cmath>
 #include <map>

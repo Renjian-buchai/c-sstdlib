@@ -1,3 +1,4 @@
+
 /*
  * This file is a part of the SubStandard C++ library.
  *
@@ -27,7 +28,7 @@
 #if !defined(SSTD_STATISTICS_HPP)
 #define SSTD_STATISTICS_HPP
 
-#include <sstd/stat/median.hpp>
-#include <sstd/stat/std_deviation.hpp>
+#include <sstd/stat/median.hh>
+#include <sstd/stat/std_deviation.hh>
 
 #endif

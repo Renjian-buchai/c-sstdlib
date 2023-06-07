@@ -34,13 +34,13 @@
  *
  */
 
-#if !defined(SSTD_MATRIX_HPP)
-#define SSTD_MATRIX_HPP
+#if !defined(SSTD_MATRIX_HH)
+#define SSTD_MATRIX_HH
 
 #include <array>
 #include <cassert>
 #include <exception>
-#include <sstd/except/invCall.hpp>
+#include <sstd/except/invCall.hh>
 
 namespace sstd {
 
@@ -70,7 +70,7 @@ class matrix2 {
   ~matrix2() {}
 
 // ANCHOR I/O
-#ifdef SSTD_PRINTCONT_HPP
+#ifdef SSTD_PRINTCONT_HH
 
   void print() const {
     for (size_t i = 0; i < sizeX; ++i) {
@@ -146,14 +146,14 @@ class matrix2 {
   }
   inline std::array<T, sizeX> operator[](size_t index) { return matx[index]; }
 
-#ifdef SSTD_VECTOR2_HPP
+#ifdef SSTD_VECTOR2_HH
 
   // Somehow implement matrix-vector multiplication.
 
 #endif
 };
 
-#ifdef SSTD_PRINTCONT_HPP
+#ifdef SSTD_PRINTCONT_HH
 
 template <typename T, size_t sizeX, size_t sizeY>
 void print(const matrix2<T, sizeX, sizeY> _matrix) {
@@ -223,4 +223,4 @@ matrix2<T, sizeX, sizeY> mult(const matrix2<T, sizeX, temp> _matrix,
 
 }  // namespace sstd
 
-#endif /* MATRIX_HPP */
+#endif /* MATRIX_HH */

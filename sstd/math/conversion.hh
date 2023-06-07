@@ -24,8 +24,8 @@
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
-#if !defined(SSTD_CONVERSION_HPP)
-#define SSTD_CONVERSION_HPP
+#if !defined(SSTD_CONVERSION_HH)
+#define SSTD_CONVERSION_HH
 
 #include <cmath>
 #include <utility>
