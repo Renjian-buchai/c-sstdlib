@@ -52,16 +52,19 @@ class matrix2 {
  public:
   // ANCHOR Constructors & destructors
   constexpr matrix2() {
-    if (sizeX != sizeY)
-      throw invCall("Identity matrix can only be applied to square matrix.");
+    (void)(sizeX != sizeY
+               ? throw invCall(
+                     "Identity matrix can only be applied to square matrix.")
+               : (void)0);
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) matx[i][j] = (i == j) ? 1 : 0;
   }
   template <class Iter>
   matrix2(const Iter begin, const Iter end) {
-    if (end - begin != sizeX * sizeY)
-      throw std::invalid_argument(
-          "Number of elements in container must be sizeX * sizeY");
+    (void)(end - begin != sizeX * sizeY
+               ? throw std::invalid_argument(
+                     "Number of elements in container must be sizeX * sizeY")
+               : (void)0);
     for (size_t i = 0, ii = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j, ++ii) matx[i][j] = *(begin + ii);
   }
@@ -90,20 +93,24 @@ class matrix2 {
   }
 
   matrix2<T, sizeX, sizeY> add(matrix2<T, sizeX, sizeY> toAdd) {
-    if (toAdd.X() != sizeX)
-      throw std::invalid_argument("Width of matrices must be equal");
-    if (toAdd.Y() != sizeY)
-      throw std::invalid_argument("Height of matrices must be equal");
+    (void)(toAdd.X() != sizeX
+               ? throw std::invalid_argument("Width of matrices must be equal")
+               : (void)0);
+    (void)(toAdd.Y() != sizeY
+               ? throw std::invalid_argument("Height of matrices must be equal")
+               : (void)0);
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) matx[i][j] += toAdd.at(i, j);
     return *this;
   }
 
   matrix2<T, sizeX, sizeY> sub(matrix2<T, sizeX, sizeY> toAdd) {
-    if (toAdd.X() != sizeX)
-      throw std::invalid_argument("Width of matrices must be equal");
-    if (toAdd.Y() != sizeY)
-      throw std::invalid_argument("Height of matrices must be equal");
+    (void)(toAdd.X() != sizeX
+               ? throw std::invalid_argument("Width of matrices must be equal")
+               : (void)0);
+    (void)(toAdd.Y() != sizeY
+               ? throw std::invalid_argument("Height of matrices must be equal")
+               : (void)0);
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) matx[i][j] -= toAdd.at(i, j);
     return *this;
@@ -116,8 +123,10 @@ class matrix2 {
   }
 
   matrix2<T, sizeX, sizeY> transpose() {
-    if (sizeX != sizeY)
-      throw invCall("Tronsposition can only be applied on square matrices");
+    (void)(sizeX != sizeY
+               ? throw invCall(
+                     "Tronsposition can only be applied on square matrices")
+               : (void)0);
     std::array<std::array<T, sizeY>, sizeX> result;
     for (size_t i = 0; i < sizeX; ++i)
       for (size_t j = 0; j < sizeY; ++j) result[i][j] = matx[j][i];
@@ -130,17 +139,22 @@ class matrix2 {
   constexpr size_t Y() const { return sizeY; }
   std::array<std::array<T, sizeX>, sizeY> matrix() const { return matx; }
   T at(size_t _x, size_t _y) const {
-    if (_x > sizeX)
-      throw std::invalid_argument("_x not in range matrix.size()");
-    if (_y > sizeY)
-      throw std::invalid_argument("_y not in range matrix[0].size()");
+    (void)(_x > sizeX
+               ? throw std::invalid_argument("_x not in range matrix.size()")
+               : (void)0);
+    (void)(_y > sizeY
+               ? throw std::invalid_argument("_y not in range matrix[0].size()")
+               : (void)0);
     return matx[_x][_y];
   }
+
   matrix2<T, sizeX, sizeY> at(size_t _x, size_t _y, T value) {
-    if (_x > sizeX)
-      throw std::invalid_argument("_x not in range matrix.size()");
-    if (_y > sizeY)
-      throw std::invalid_argument("_y not in range matrix[0].size()");
+    (void)(_x > sizeX
+               ? throw std::invalid_argument("_x not in range matrix.size()")
+               : (void)0);
+    (void)(_y > sizeY
+               ? throw std::invalid_argument("_y not in range matrix[0].size()")
+               : (void)0);
     matx[_x][_y] = value;
     return *this;
   }
@@ -169,10 +183,12 @@ void print(const matrix2<T, sizeX, sizeY> _matrix) {
 template <typename T, size_t sizeX, size_t sizeY>
 matrix2<T, sizeX, sizeY> add(const matrix2<T, sizeX, sizeY> _matrix,
                              const matrix2<T, sizeX, sizeY> toAdd) {
-  if (toAdd.X() != _matrix.X())
-    throw std::invalid_argument("Width of matrices must be equal");
-  if (toAdd.Y() != _matrix.Y())
-    throw std::invalid_argument("Height of matrices must be equal");
+  (void)(toAdd.X() != _matrix.X()
+             ? throw std::invalid_argument("Width of matrices must be equal")
+             : (void)0);
+  (void)(toAdd.Y() != _matrix.Y()
+             ? throw std::invalid_argument("Height of matrices must be equal")
+             : (void)0);
   matrix2<T, sizeX, sizeY> result;
   for (int i = 0; i < sizeX; ++i)
     for (int j = 0; j < sizeY; ++j)
@@ -183,10 +199,12 @@ matrix2<T, sizeX, sizeY> add(const matrix2<T, sizeX, sizeY> _matrix,
 template <typename T, size_t sizeX, size_t sizeY>
 matrix2<T, sizeX, sizeY> sub(const matrix2<T, sizeX, sizeY> _matrix,
                              const matrix2<T, sizeX, sizeY> toSub) {
-  if (toSub.X() != _matrix.X())
-    throw std::invalid_argument("Width of matrices must be equal");
-  if (toSub.Y() != _matrix.Y())
-    throw std::invalid_argument("Height of matrices must be equal");
+  (void)(toSub.X() != _matrix.X()
+             ? throw std::invalid_argument("Width of matrices must be equal")
+             : (void)0);
+  (void)(toSub.Y() != _matrix.Y()
+             ? throw std::invalid_argument("Height of matrices must be equal")
+             : (void)0);
   matrix2<T, sizeX, sizeY> result;
   for (int i = 0; i < sizeX; ++i)
     for (int j = 0; j < sizeY; ++j)
@@ -207,9 +225,10 @@ matrix2<T, sizeX, sizeY> mult(const matrix2<T, sizeX, sizeY> _matrix,
 template <typename T, size_t sizeX, size_t temp, size_t sizeY>
 matrix2<T, sizeX, sizeY> mult(const matrix2<T, sizeX, temp> _matrix,
                               const matrix2<T, temp, sizeY> toMult) {
-  if (_matrix.Y() != toMult.X())
-    throw std::invalid_argument(
-        "Height of _matrix must equal to width of toMult");
+  (void)(_matrix.Y() != toMult.X()
+             ? throw std::invalid_argument(
+                   "Height of _matrix must equal to width of toMult")
+             : (void)0);
   matrix2<T, sizeX, sizeY> result;
   for (int i = 0; i < sizeY; ++i)
     for (int j = 0; j < sizeX; ++j) {

@@ -39,7 +39,7 @@ namespace sstd {
 template <typename const_iter>
 void print(const_iter begin, const_iter end) {
   std::cout << "{";
-  for (; begin != end; ++begin) std::cout << *begin << ", ";
+  for (; begin != end - 1; ++begin) std::cout << *begin << ", ";
   std::cout << *(--end) << "}";
 }
 

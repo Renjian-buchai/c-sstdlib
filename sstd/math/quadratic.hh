@@ -28,8 +28,6 @@
 #define SSTD_QUADRATIC_HH
 
 #include <array>
-
-
 #include <cmath>
 #include <complex>
 #include <exception>
@@ -48,8 +46,9 @@ namespace sstd {
 template <typename T = double>
 std::pair<T, T> rquadratic(const T a, const T b, const T c) {
   const T disc = b * b - 4 * a * c;
-  if (disc < 0)
-    throw new std::invalid_argument("Only defined if b * b - 4ac >= 0");
+  (void)(disc < 0 ? throw new std::invalid_argument(
+                        "Only defined if b * b - 4ac >= 0")
+                  : (void)0);
   return std::pair<T, T>{(-b - std::sqrt(disc)) * 0.5 / a,
                          (-b + std::sqrt(disc)) * 0.5 / a};
 }

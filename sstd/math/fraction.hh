@@ -79,17 +79,12 @@ class fraction {
 
   fraction() = default;
   fraction(T numerator, T denominator) {
-    if (denominator == 0) {
-      throw div0();
-    }
-
-    numr = numerator;
-    denr = denominator;
+    (void)(denominator == 0 ? throw div0() : (void)(numr = numerator),
+           (void)(denr = denominator));
   }
   fraction(std::initializer_list<T> _fraction) {
-    if (_fraction.size() != 2) {
-      throw invCall("Number of arguments is wrong");
-    }
+    (void)(_fraction.size() != 2 ? throw invCall("Number of arguments is wrong")
+                                 : (void)0);
     auto it = _fraction.begin();
     numr = *it;
     denr = *(++it);
@@ -100,32 +95,22 @@ class fraction {
 #if defined(SSTD_PRINTCONT_HH)
 
   void print() const {
-    if (denr == 0) {
-      throw div0();
-    }
-
-    if (denr == 1) {
-      std::cout << numr;
-    } else {
-      std::cout << numr << "/" << denr;
-    }
+    (void)(denr == 0
+               ? throw div0()
+               : (void)(denr == 1 ? std::cout << numr,
+                        (void)0   : std::cout << numr << "/" << denr, (void)0));
   }
-
 #endif
 
   template <typename F>
   inline F dec() const {
     // Throwing is more predictable than returning NaN
-    if (denr == 0) {
-      throw div0();
-    }
+    (void)(denr == 0 ? throw div0() : (void)0);
 
     return numr / denr;
   }
   fraction<T> simplify() {
-    if (denr == 0) {
-      throw div0();
-    }
+    (void)(denr == 0 ? throw div0() : (void)0);
 
     T highest;
     // Short circuit because num == 0
@@ -135,11 +120,7 @@ class fraction {
       // HCF algorithm (iterative)
       T ncpy = numr, dcpy = denr;
       while (ncpy != dcpy) {
-        if (ncpy > dcpy) {
-          ncpy -= dcpy;
-        } else {
-          dcpy -= ncpy;
-        }
+        (void)(ncpy > dcpy ? (void)(ncpy -= dcpy) : (void)(dcpy -= ncpy));
       }
       highest = ncpy;
     }

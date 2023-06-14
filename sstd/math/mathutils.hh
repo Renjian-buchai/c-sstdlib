@@ -51,11 +51,7 @@ uns_int hcf(const uns_int x, const uns_int y) {
   {
     uns_int xcpy = x, ycpy = y;
     while (xcpy != ycpy) {
-      if (xcpy > ycpy) {
-        xcpy -= ycpy;
-      } else {
-        ycpy -= xcpy;
-      }
+      (void)xcpy > ycpy ? (void)(xcpy -= ycpy) : (void)(ycpy -= xcpy);
     }
 
     return xcpy;
@@ -77,11 +73,7 @@ uns_int lcm(const uns_int x, const uns_int y) {
   {
     uns_int xcpy = x, ycpy = y;
     while (xcpy != ycpy) {
-      if (xcpy > ycpy) {
-        xcpy -= ycpy;
-      } else {
-        ycpy -= xcpy;
-      }
+      (void)xcpy > ycpy ? (void)(xcpy -= ycpy) : (void)(ycpy -= xcpy);
     }
     hcf = xcpy;
   }
@@ -126,7 +118,7 @@ double qisqrt(double x, size_t precision) {
 
 template <typename Int>
 std::pair<Int, Int> divmod(Int x, Int y) {
-  return std::pair<Int, Int> { std::floor(x / y), x % y }
+  return std::pair<Int, Int>{std::floor(x / y), x % y};
 }
 
 }  // namespace sstd
