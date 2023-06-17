@@ -21,12 +21,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see
- * 
+ *
  * <https://creativecommons.org/licenses/by-nc/4.0/>.
  */
 
 #ifndef SSTD_UTIL_HPP
 
 #include <sstd/util/contify.hh>
+#include <sstd/util/functime.hh>
+#include <sstd/util/tostrvec.hh>
 
 #endif

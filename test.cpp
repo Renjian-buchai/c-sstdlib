@@ -11,19 +11,19 @@
 #include <string>
 #include <vector>
 
-// template <typename uInt>
-// uInt iterative_gcd(const uInt x, const uInt y) {
-//   uInt ycpy = y;
-//   {
-//     uInt xcpy = x, temp = xcpy % ycpy;
-//     while (temp != 0) {
-//       temp = xcpy % ycpy;
-//       xcpy = ycpy;
-//       ycpy = temp;
-//     }
-//   }
-//   return ycpy;
-// }
+template <typename uInt>
+uInt iterative_gcd(const uInt x, const uInt y) {
+  uInt ycpy = y;
+  {
+    uInt xcpy = x, temp = xcpy % ycpy;
+    while (temp != 0) {
+      temp = xcpy % ycpy;
+      xcpy = ycpy;
+      ycpy = temp;
+    }
+  }
+  return ycpy;
+}
 
 int main(int argc, char* argv[]) {
   std::chrono::steady_clock::time_point t0 = std::chrono::steady_clock::now();
@@ -234,18 +234,25 @@ int main(int argc, char* argv[]) {
   //                  .count()
   //           << "\n";
 
-  char arr[3][4] = {"abc", "def", "ghi"};
+  // char arr[3][4] = {"abc", "def", "ghi"};
 
-  // Initialize char** manually
-  char* ptr[3];
-  ptr[0] = arr[0];
-  ptr[1] = arr[1];
-  ptr[2] = arr[2];
+  // // Initialize char** manually
+  // char* ptr[3];
+  // ptr[0] = arr[0];
+  // ptr[1] = arr[1];
+  // ptr[2] = arr[2];
 
-  std::vector<std::string> vec = sstd::toStrVec(ptr, 3);
-  sstd::print(vec.begin(), vec.end());
+  // std::vector<std::string> vec = sstd::toStrVec(ptr, 3);
+  // sstd::print(vec.begin(), vec.end());
 
   // sstd::rquadratic(1, 2, 1);
+
+  std::pair<std::chrono::duration<long double, std::milli>, int> x =
+      sstd::funcTime(&iterative_gcd<int>, 10, 20, 10);
+
+  auto y = &iterative_gcd<int>;
+
+  std::cout << x.first.count() << "ms, " << x.second << "\n";
 
   std::cout << "\nDone! Terminated in: "
             << std::chrono::duration_cast<std::chrono::duration<double>>(

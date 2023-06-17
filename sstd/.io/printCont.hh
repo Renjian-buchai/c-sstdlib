@@ -27,8 +27,9 @@
 #if !defined(SSTD_PRINTCONT_HH)
 #define SSTD_PRINTCONT_HH
 
-#include <algorithm>  // std::reverse
-#include <iostream>   // std::cout
+#include <algorithm>  /// std::reverse
+#include <iostream>   /// std::cout
+#include <string>     /// std::string
 
 namespace sstd {
 
@@ -41,6 +42,13 @@ void print(const_iter begin, const_iter end) {
   std::cout << "{";
   for (; begin != end - 1; ++begin) std::cout << *begin << ", ";
   std::cout << *(--end) << "}";
+}
+
+template <typename const_iter>
+std::string toStr(const_iter begin, const_iter end) {
+  std::string result = "{";
+  for (; begin != end - 1; ++begin) result += (std::string(*begin) + ", ");
+  return result + *(--end) + "}";
 }
 
 }  // namespace sstd
