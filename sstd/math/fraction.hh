@@ -93,7 +93,6 @@ class fraction {
   ~fraction(){};
 
 #if defined(SSTD_PRINTCONT_HH)
-
   void print() const {
     (void)(denr == 0
                ? throw div0()
