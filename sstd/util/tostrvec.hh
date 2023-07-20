@@ -1,17 +1,26 @@
-#if !defined(SSTD_TOSTRVEC_HH)
-#define SSTD_TOSTRVEC_HH
+#if !defined(SSTDV2_TOSTRVEC)
+#define SSTDV2_TOSTRVEC
 
 #include <string>
 #include <vector>
 
 namespace sstd {
 
-std::vector<std::string> toStrVec(char** pCharArr, size_t size) {
-  std::vector<std::string> result;
-  for (size_t i = 0; i < size; ++i) {
-    result.push_back(std::string(pCharArr[i]));
+/**
+ * @brief Converts char** to an std::vector of std::strings
+ *
+ * @param charArr cstring array to input
+ * @param size Size of cstring array
+ * @return std::vector of std::strings
+ *
+ * @example Input argc and argv into a more convenient way to access arguments
+ */
+std::vector<std::string> toStrVec(char** charArr, int size) {
+  std::vector<std::string> ret;
+  for (int i = 0; i < size; ++i) {
+    ret.push_back(std::string(charArr[size]));
   }
-  return result;
+  return ret;
 }
 
 }  // namespace sstd
