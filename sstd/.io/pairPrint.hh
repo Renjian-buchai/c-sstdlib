@@ -1,6 +1,7 @@
 #if !defined(SSTD_PAIRPRINT_HH)
 #define SSTD_PAIRPRINT_HH
 
+#include <iostream>
 #include <string>
 #include <utility>
 

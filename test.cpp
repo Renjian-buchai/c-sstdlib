@@ -8,6 +8,7 @@
 #include <sstd\.io.hh>
 #include <sstd\subStandard.hh>
 #include <sstd\util\tostrvec.hh>
+#include <sstdv2\.io\printCont.hh>
 #include <string>
 #include <vector>
 
@@ -252,7 +253,11 @@ int main(int argc, char* argv[]) {
 
   auto y = &iterative_gcd<int>;
 
+  std::vector<int> z{1, 2, 3, 4, 5};
+
   std::cout << x.first.count() << "ms, " << x.second << "\n";
+
+  sstd::output(z.begin(), z.end());
 
   std::cout << "\nDone! Terminated in: "
             << std::chrono::duration_cast<std::chrono::duration<double>>(

@@ -28,6 +28,6 @@
 #define SSTD_IO_HPP
 
 #include <sstd/.io/pairPrint.hh>
-#include <sstd/.io/printCont.hh>
+#include <sstdv2/.io/printCont.hh>
 
 #endif /* IO_HPP */
